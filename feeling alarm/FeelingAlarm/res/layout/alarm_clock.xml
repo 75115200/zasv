@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@color/main_bgcolor">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:src="@drawable/top"
+        ></ImageView>
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:background="@drawable/clock_bg" >
+		<LinearLayout
+	        android:id="@+id/clock_layout"
+	        android:layout_width="@dimen/analog_clock_height"
+	        android:layout_height="@dimen/analog_clock_height"
+	        android:layout_marginBottom="8dip"
+	        android:gravity="center">
+        </LinearLayout> 
+			<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			    android:layout_width="fill_parent"
+			    android:layout_height="fill_parent"
+			    android:orientation="vertical" >
+
+				<TextView
+				    android:id="@+id/main_label"
+				    android:layout_width="match_parent"
+				    android:layout_height="wrap_content"
+				    android:layout_gravity="bottom|center_horizontal"
+				    android:layout_weight="7"
+				    android:gravity="center_vertical|center_horizontal"
+				    android:text="@string/warning"
+				    android:textSize="@dimen/main_label_size" />
+			</LinearLayout>		
+	</LinearLayout>
+		<ListView
+		    android:id="@+id/alarms_list"
+		    android:layout_width="match_parent"
+		    android:layout_height="0dip"
+		    android:layout_weight="1"
+		    android:divider="@drawable/div">		    
+		</ListView>
+
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="bottom">
+	    <ImageButton 
+		    android:id="@+id/add_button"
+		    android:layout_width="match_parent"
+		    android:layout_height="@dimen/add_button_height" 
+		    android:src="@drawable/add_button"
+		    android:clickable="true"/>
+	 </LinearLayout>
+</LinearLayout>

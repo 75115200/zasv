@@ -1,0 +1,75 @@
+body
+{
+	font-family:"Lucida Console","Î¢ÈíÑÅºÚ";
+	background-color:transparent;
+}
+
+#main
+{
+	width:850px;
+	height:500px;
+}
+
+#metro
+{
+	border:1px solid #1C86EE; 
+	background-color:#00bb5b;
+	height:100%;
+	width:100%;
+	padding:0px;
+	margin-top:0px;
+}
+
+#metro .sub
+{
+	margin:0 0;
+	width:100%;
+}
+
+#metro .sub_i
+{
+	width:40px;
+	height:40px;
+	margin:0 auto 0 auto;
+}
+
+#metro .sub_i img
+{
+	width:40px;
+	height:40px;
+	border-bottom:1px solid #1C86EE;
+	border-left:1px solid #00bb5b;
+}
+
+#metro .sub_t 
+{
+	background-color:#1C86EE;
+	margin:0 0;
+	height:40px;
+	text-align:center;
+	
+	vertical-align:middle;
+	border-top:1px solid #1C86EE;
+	border-right:1px solid #1C86EE;
+}
+#metro .sub_t p
+{
+	color:white;
+	font-size:15pt;
+	line-height:0px;
+}
+
+#metro .cont
+{
+	margin:0 0;
+	width:100%;
+	text-align:center;
+	vertical-align:middle;
+}
+
+#metro .cont p
+{
+	font-size:20px;
+	font-color:black;
+}
+

@@ -1,0 +1,65 @@
+body
+{
+	background-color:transparent;
+	font-family:"Lucida Console",Î¢ÈíÑÅºÚ;
+}
+
+#head
+{
+	height:60px;
+	width:800px;
+	margin:auto auto;
+}
+
+#head .d1
+{
+	float:left;
+	margin:auto auto;
+	width:500px;
+	height:60px;
+}
+
+#head .d1 p
+{
+	font-family:Î¢ÈíÑÅºÚ;
+	font-size:20pt;
+	text-align:center;
+}
+
+#list
+{	font-family:Î¢ÈíÑÅºÚ;
+	font-size:20pt;
+	text-align:center;
+}
+
+#head .d2
+{
+	float:right;
+	height:60px;
+	margin:auto auto;
+	border-left:2px gray solid;
+}
+
+#head .d2 ul
+{
+	margin:0 0;
+	float:left;
+	list-style:none;
+}
+
+a
+{
+	text-decoration:none;
+	color:black;
+}
+
+a:hover
+{
+	color:#EE9A00;
+	text-decoration:underline;
+}
+
+#dcl
+{
+	font-size:10pt;
+}

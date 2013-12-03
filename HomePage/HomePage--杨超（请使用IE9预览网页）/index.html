@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN""http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>飏_Home Page_Young</title>
+		<meta http-equiv="content-type" content="text/html; charset=gb2312" />
+		<link rel="stylesheet" type="text/css" href="style/FeelBeauty.css" />
+		<script language="javascript" type="text/javascript" src="js/main.js" ></script>
+		<script language="JavaScript" >
+			var bgimg=["img/bg1.jpg","img/bg2.jpg","img/bg3.jpg","img/bg4.jpg","img/bg5.jpg","img/bg6.jpg","img/bg7.jpg"];
+			var count = 0;
+			var timeDelay = 30000;
+			function changeBg()
+			{
+ 				document.body.style.backgroundImage="url("+bgimg[count]+")";
+				if (++count == bgimg.length)
+				{
+					count = 0;
+				}
+				setTimeout("changeBg()",timeDelay);
+			}
+			setTimeout("changeBg()",0);
+		</script>	
+		
+	</head>
+	<body bgcolor="#BBE4FF">
+		<embed  src="http://wap.zaawoo.com/upfile/200931315612911.wma" hidden=true autostart=true loop=false />
+		<div id="title">
+			<h1 align="center" onMouseOver="shiftColor('young','#1C86EE')" onMouseOut="shiftColor('young','black')">HomePage-<span id="young">Young</span></h1>
+		</div>
+		<div id="middle">
+			<div id="left">
+			<ul>
+				<li><a href="pages/gallery.html" target="iframe">Gallery</a></li>
+				<li><a href="pages/profile.html" target="iframe">Profile</a></li>
+				<li><a href="pages/blogs_list.html" target="iframe">Blogs&nbsp&nbsp</a></li>
+				<li><a href="pages/views.html" target="iframe">Views</a></li>
+			</ul>
+			</div>
+			<div id="content">
+				<iframe name="iframe" id="iframe" align="center" allowtransparency="true" width="850px" height="500px" onload="setSize('iframe')" scrolling="no"  scroolBorder=0 src="pages/gallery.html"></iframe>
+			</div>
+		</div>
+	</body>
+</html>

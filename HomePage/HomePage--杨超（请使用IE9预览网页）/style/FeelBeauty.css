@@ -1,0 +1,60 @@
+body
+{
+	font-family:"Lucida Console","Î¢ÈíÑÅºÚ";
+}
+
+#title
+{
+	margin : 10px auto;
+}
+
+#young
+{
+	font-size:1em;
+}
+
+#middle
+{
+	margin: 0 auto;
+	width:1040px;
+}
+
+#left
+{
+	margin:5% 0;
+	float:left;
+	width:180px;
+}
+
+#left ul
+{
+	float:left;
+	list-style:none;
+}
+
+#left ul li a
+{
+	font-size: 25px;
+	color:#1C86EE;
+	text-decoration:none;
+	line-height:70px;
+}
+#left ul li a:hover
+{
+	font-size: 30px;
+	color:#EEC900;
+	text-decoration:underline;
+	line-height:70px;
+}
+	
+#content
+{
+	float:right;
+	margin:0 0;
+	width:860px;
+}
+
+#iframe
+{
+	border-width:0px;
+}

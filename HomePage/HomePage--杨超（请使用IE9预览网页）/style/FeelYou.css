@@ -1,0 +1,46 @@
+body
+{
+	background-color:transparent;
+	font-family:"Lucida Console",Î¢ÈíÑÅºÚ;
+}
+
+#head
+{
+
+	font-size:20pt;
+	text-align:center;
+}
+
+div
+{
+	width:800px;
+	margin:auto auto;
+	background-color:#C0FF3E;
+	border:1px solid #11EE11;
+	filter:80% 80%;
+}
+
+div div
+{
+	background-color:#FF7F00;
+}
+
+#name
+{
+	font-size:12pt;
+	text-align:left;
+	color:white;
+}
+
+#view
+{
+	width:700px;
+	height:80px;
+}
+
+#submit
+{
+	margin:0 0;
+	width:80px;
+	height:40px;
+}

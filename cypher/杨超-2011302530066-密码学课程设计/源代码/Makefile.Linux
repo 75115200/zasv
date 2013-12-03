@@ -1,0 +1,39 @@
+TARGET:=libCypher.so
+CC:=gcc
+CFLAGS:=-I'/opt/jdk1.7.0_21/include/' -I'/opt/jdk1.7.0_21/include/linux/'  -fPIC 
+LDFLAGS:=-shared 
+
+CLASS_NAME:=Cypher
+
+JSOURCE:=$(CLASS_NAME).java
+CLASS:=$(CLASS_NAME).class
+
+SOURCES:=$(CLASS_NAME).c des.c aes.c rc4.c
+HEADERS:=$(CLASS_NAME).h des.h aes.h rc4.h
+OBJECTS:=$(CLASS_NAME).o des.o aes.o rc4.o
+
+UI.class:$(CLASS) UI.java
+	javac UI.java
+
+$(CLASS):$(TARGET) $(JSOURCE)
+	javac $(JSOURCE)
+
+$(TARGET):$(OBJECTS) $(HEADERS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(TARGET) 
+
+$(OBJECTS):$(SOURCES) $(HEADERS)
+	$(CC) $(CFLAGS) -c $(SOURCES)
+
+.PHONY:clean r e c
+
+clean:
+	$(RM) $(TARGET) $(CLASS) $(OBJECTS) *.class
+
+r:$(TARGET)
+	export LD_LIBRARY_PATH=`pwd`;java UI
+
+e:
+	vim $(CLASS_NAME).java 
+
+c:
+	vim $(CLASS_NAME).c
