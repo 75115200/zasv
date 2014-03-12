@@ -1,4 +1,4 @@
-/*************************************************************************
+﻿/*************************************************************************
   > File Name:     Cypher.java
   > Author:        Landerl Young
   > Mail:          LanderlYoung@gmail.com 
@@ -14,12 +14,28 @@ public class Cypher {
 	private static final String rc4String = "Rc4";
 	private static final String doneString =
 		"<html><font color=\"red\">完成</font></html>";
+	static
+	{
+		if (System.getProperty("os.name").equalsIgnoreCase("Windows")) {
+			if (!System.getProperty("os.arch").contains("64"))
+			{
+				if (!LoadLibrary.loadLibraryInJar(Cypher.class.getResourceAsStream("Cypher.dll")))
+				{
+					System.err.println("LoadLibrary Failed");
+				}
+			} } else if (System.getProperty("os.name").equalsIgnoreCase("Linux")) {
+				if ((System.getProperty("os.arch").contains("64")) && 
+						(!LoadLibrary.loadLibraryInJar(Cypher.class.getResourceAsStream("libCypher.so"))))
+				{
+					System.err.println("LoadLibrary Failed");
+				}
 
-	static {
-		System.loadLibrary("Cypher");
-	}
-
-	/**Des*/
+			}
+		else if (System.getProperty("os.name").equalsIgnoreCase("Mac OS X")) {
+			if (!LoadLibrary.loadLibraryInJar(Cypher.class.getResourceAsStream("Cypher.dylib")));
+			System.err.println("LoadLibrary Failed");
+		}
+	}	/**Des*/
 	public static native void desKeySetUp(byte[] key);
 	public static native void desEncryption(byte[] message,
 			byte[] cypher);
@@ -322,11 +338,11 @@ public class Cypher {
 		 System.out.println(System.currentTimeMillis() - now);
 		 */
 		}
-		static void show(byte[] m, byte[] c, byte[] k) {
-			System.out.println("_________________________");
-			System.out.println("M: " + Arrays.toString(m));
-			System.out.println("C: " + Arrays.toString(c));
-			System.out.println("K: " + Arrays.toString(k));
-		}
+	static void show(byte[] m, byte[] c, byte[] k) {
+		System.out.println("_________________________");
+		System.out.println("M: " + Arrays.toString(m));
+		System.out.println("C: " + Arrays.toString(c));
+		System.out.println("K: " + Arrays.toString(k));
+	}
 	}
 

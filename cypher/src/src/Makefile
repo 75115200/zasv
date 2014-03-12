@@ -1,6 +1,8 @@
 TARGET:=Cypher.dll
+
+#mingw
 CC:=gcc
-CFLAGS:=-I"D:\Program Files\Java\jdk1.7.0_11\include" -I"D:\Program Files\Java\jdk1.7.0_11\include\win32" -shared  -Wl,--kill-at
+CFLAGS:=-I"${JAVA_HOME}\include" -I"${JAVA_HOME}\include\win32" -shared  -Wl,--kill-at
 
 CLASS_NAME:=Cypher
 

@@ -1,6 +1,6 @@
 TARGET:=libCypher.so
 CC:=gcc
-CFLAGS:=-I'/opt/jdk1.7.0_21/include/' -I'/opt/jdk1.7.0_21/include/linux/'  -fPIC 
+CFLAGS:=-I'${JAVA_HOME}/include/' -I'${JAVA_HOME}/include/linux/'  -fPIC 
 LDFLAGS:=-shared 
 
 CLASS_NAME:=Cypher

@@ -1,4 +1,4 @@
-/*************************************************************************
+ï»¿/*************************************************************************
   > File Name:     UI.java
   > Author:        Landerl Young
   > Mail:          LanderlYoung@gmail.com 
@@ -21,34 +21,34 @@ public class UI extends JFrame {
 	private static final String aesString = "Aes";
 	private static final String rc4String = "Rc4";
 	private static final String srcFileString = 
-		"Ô´ÎÄ¼ş";
+		"æºæ–‡ä»¶";
 	private static final String dstFileString =
-		"Ä¿µÄÎÄ¼ş";
+		"ç›®çš„æ–‡ä»¶";
 	private static final String radioButtonPanelString = 
-		"Ñ¡Ôñ¼ÓÃÜËã·¨";
+		"é€‰æ‹©åŠ å¯†ç®—æ³•";
 	private static final String passwordString = 
-		" ÃÜÂë";
+		" å¯†ç ";
 	private static final String encryButtonString = 
-		"¼ÓÃÜ";
+		"åŠ å¯†";
 	private static final String descryButtonString =
-		"½âÃÜ";
+		"è§£å¯†";
 	private static final String fileSelectPanelTitleString = 
-		"Ñ¡ÔñÎÄ¼ş";
+		"é€‰æ‹©æ–‡ä»¶";
 	private static final String srcFileChooserDialogTitle = 
-		"Ñ¡ÔñÔ´ÎÄ¼ş";
+		"é€‰æ‹©æºæ–‡ä»¶";
 	private static final String dstFileChooserDialogString = 
-		"Ñ¡ÔñÃÜÎÄ";
+		"é€‰æ‹©å¯†æ–‡";
 	private static final String srcFileNotFoundMessageString = 
-		"Ô´ÎÄ¼şÎª¿Õ";
+		"æºæ–‡ä»¶ä¸ºç©º";
 	private static final String dstFileNotFoundMessageString = 
-		"ÃÜÎÄÎª¿Õ";
+		"å¯†æ–‡ä¸ºç©º";
 	private static final String passwordNullMessageString = 
-		"ÃÜÂëÎª¿Õ";
+		"å¯†ç ä¸ºç©º";
 	private static final String errTitle =
-		"´íÎó";
+		"é”™è¯¯";
 
-	private static final String titleString = 
-		"ÃÜÂëÑ§¿Î³ÌÉè¼Æ_ïr_Ñî³¬";
+	private static final String titleString =
+		"å¯†ç å­¦è¯¾ç¨‹è®¾è®¡___æ¨è¶…";
 
 	private final static String imageFileString = 
 		"images/file.png";
