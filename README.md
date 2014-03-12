@@ -1,4 +1,4 @@
-这里面是我在大学期间写的一些代码。
+﻿这里面是我在大学期间写的一些代码。
 有些是大作业:
 * [cypher][1] —— 大二的密码学大作业
 * [data structure big work][2] —— 大一的数据结构大作业
@@ -20,10 +20,10 @@
 
 
 [1]:cypher/
-[2]:"data structure big work/"
-[3]:"student-manager-system"
-[4]:"Smart Card/"
-[5]:"操作系统大作业/"
-[6]:"HomePage/"
-[7]:"feeling alarm/"
-[8]:"BigData/"
+[2]:data structure big work/
+[3]:student-manager-system
+[4]:Smart Card/
+[5]:操作系统大作业/
+[6]:HomePage/
+[7]:feeling alarm/
+[8]:BigData/
