@@ -17,8 +17,7 @@
 * 学二叉排序树的自己写的实现代码
 * 一个cocos2d-x的项目模板  
 
-:dolphin: :turtle: :fish: :snail: :honeybee: :cactus:  :sunflower: :octocat:  :loop: :watch:   
-:tomato:  :eggplant: :egg: :cn: 
+:dolphin: :turtle: :fish: :snail: :honeybee: :cactus:  :sunflower: :octocat:  :loop: :watch: :tomato:  :eggplant: :egg: :cn: 
 
 
 [1]:cypher/
