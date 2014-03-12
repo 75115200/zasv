@@ -15,8 +15,10 @@
 * 学算法的时候写的东西
 * 学二叉树时自己写的实现代码
 * 学二叉排序树的自己写的实现代码
-* 一个cocos2d-x的项目模板
-…… ……
+* 一个cocos2d-x的项目模板  
+
+:dolphin: :turtle: :fish: :snail: :honeybee: :cactus:  :sunflower: :octocat:  :loop: :watch:   
+:tomato:  :eggplant: :egg: :cn: 
 
 
 [1]:cypher/
