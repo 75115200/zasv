@@ -2,3 +2,8 @@
 *.docx
 *.o
 
+#intellij
+*.iml
+.idea
+util/out
+
