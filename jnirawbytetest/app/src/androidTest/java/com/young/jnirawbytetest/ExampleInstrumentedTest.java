@@ -58,8 +58,13 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void testJavaArrayIterator() {
-        TestCase.testJavaArrayIterator();
+    public void testJavaBatchMemset() {
+        TestCase.testJavaBatchMemset();
+    }
+
+    @Test
+    public void testCppBatchMemset() {
+        TestCase.testCppBatchMemset();
     }
 
     @Test

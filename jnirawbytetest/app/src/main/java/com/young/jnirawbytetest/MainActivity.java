@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     public static void performanceTest() {
         final int limit = 1024*1024;
         for (int i = 0; i < limit; i++) {
-            CppSide.passByteArrayToNative(null);
+            JavaJniPerformanceCompare.passByteArrayToNative(null);
         }
     }
 }

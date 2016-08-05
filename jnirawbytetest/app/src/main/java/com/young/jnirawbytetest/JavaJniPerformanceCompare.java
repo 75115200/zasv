@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
  * Life with Passion, Code with Creativity.
  */
 @NativeClass
-public class CppSide {
+public class JavaJniPerformanceCompare {
     static {
         System.loadLibrary("native-lib");
     }
@@ -52,8 +52,8 @@ public class CppSide {
             "jboolean isCopy;",
             "const jint length = env->GetArrayLength(data);",
             "jbyte *arr = env->GetByteArrayElements(data, &isCopy);",
-            "std::memset(arr, sizeof(jbyte), length);",
-            "env->ReleaseByteArrayElements(data, arr, JNI_COMMIT);",
+            "std::memset(arr, 1, length);",
+            "env->ReleaseByteArrayElements(data, arr, 0);",
             "LOGV(\"GetByteArrayElements isCopy %s\", (isCopy ? \"true\" : \"false\"));",
     })
     public static native void passByteArrayToNative(@NonNull byte[] data);
@@ -66,7 +66,7 @@ public class CppSide {
     @NativeCode({
             "jbyte *arr = static_cast<jbyte *>(env->GetDirectBufferAddress(data));",
             "jlong length = env->GetDirectBufferCapacity(data);",
-            "std::memset(arr, sizeof(jbyte), length);"
+            "std::memset(arr, 1, length);"
     })
     public static native void passByteBufferToNative(@NonNull ByteBuffer data);
 
@@ -88,4 +88,23 @@ public class CppSide {
             System.arraycopy(src, 0, dst, 0, size);
         }
     }
+
+    @NativeCode({
+            "char *data = new char[size];",
+            "for (int i = 0; i < count; i++) {",
+            "   std::memset(data, 1, size);",
+            "}",
+            "delete[] data;",
+    })
+    public static native void cppBatchMemset(int size, int count);
+
+    public static void javaBatchMemset(int size, int count) {
+        byte[] data = new byte[size];
+        for (int i = 0; i < count; i++) {
+            for (int j = 0; j < size; j++) {
+                data[j] = (byte) 1;
+            }
+        }
+    }
+
 }

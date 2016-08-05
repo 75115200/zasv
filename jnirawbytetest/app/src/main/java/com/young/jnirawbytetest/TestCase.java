@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 /**
  * Author: taylorcyang@tencent.com
@@ -26,7 +25,7 @@ public class TestCase {
         testCppBatchAdd();
         testPassByteArrayToNative();
         testPassByteBufferToNative();
-        testJavaArrayIterator();
+        testJavaBatchMemset();
         testJavaReadDirectBuffer();
         testCppBatchMemcpy();
         testJavaBatchArrayCopy();
@@ -52,7 +51,7 @@ public class TestCase {
     public static void testJavaAdd() {
         long time = System.nanoTime();
         for (int i = 0; i < BIG_COUNT; i++) {
-            CppSide.javaAdd(0xffff, 1);
+            JavaJniPerformanceCompare.javaAdd(0xffff, 1);
         }
         time = System.nanoTime() - time;
 
@@ -62,7 +61,7 @@ public class TestCase {
     public static void testCppAdd() {
         long time = System.nanoTime();
         for (int i = 0; i < BIG_COUNT; i++) {
-            CppSide.add(0xffff, 1);
+            JavaJniPerformanceCompare.add(0xffff, 1);
         }
         time = System.nanoTime() - time;
 
@@ -72,7 +71,7 @@ public class TestCase {
     public static void testJavaBatchAdd() {
         long time = System.nanoTime();
         for (int i = 0; i < SMALL_COUNT; i++) {
-            CppSide.javaBatchAdd(0xffff, 1, SMALL_COUNT);
+            JavaJniPerformanceCompare.javaBatchAdd(0xffff, 1, SMALL_COUNT);
         }
         time = System.nanoTime() - time;
 
@@ -82,11 +81,27 @@ public class TestCase {
     public static void testCppBatchAdd() {
         long time = System.nanoTime();
         for (int i = 0; i < SMALL_COUNT; i++) {
-            CppSide.batchAdd(0xffff, 1, SMALL_COUNT);
+            JavaJniPerformanceCompare.batchAdd(0xffff, 1, SMALL_COUNT);
         }
         time = System.nanoTime() - time;
 
         Log.i(TAG, "cppBatchAdd(0xffff+ 1) 1K, 1K ," + time + ", " + time / BIG_COUNT);
+    }
+
+    public static void testJavaBatchMemset() {
+        long totalTime = System.nanoTime();
+        JavaJniPerformanceCompare.javaBatchMemset(BIG_COUNT, SMALL_COUNT);
+        totalTime = System.nanoTime() - totalTime;
+
+        Log.i(TAG, "javaBatchMemset(1M) , 1K ," + totalTime + ", " + totalTime / SMALL_COUNT);
+    }
+
+    public static void testCppBatchMemset() {
+        long totalTime = System.nanoTime();
+        JavaJniPerformanceCompare.cppBatchMemset(BIG_COUNT, SMALL_COUNT);
+        totalTime = System.nanoTime() - totalTime;
+
+        Log.i(TAG, "cppBatchMemset(1M) , 1K ," + totalTime + ", " + totalTime / SMALL_COUNT);
     }
 
     public static void testPassByteArrayToNative() {
@@ -99,13 +114,13 @@ public class TestCase {
             setValue(data, (byte) 0);
 
             startTime = System.nanoTime();
-            CppSide.passByteArrayToNative(data);
+            JavaJniPerformanceCompare.passByteArrayToNative(data);
             totalTime += System.nanoTime() - startTime;
 
             assertValue(data, (byte) 1);
         }
 
-        Log.i(TAG, "passByteArrayToNative , 1K ," + totalTime + ", " + totalTime / SMALL_COUNT);
+        Log.i(TAG, "passByteArrayToNative(1M) , 1K ," + totalTime + ", " + totalTime / SMALL_COUNT);
     }
 
     public static void testPassByteBufferToNative() {
@@ -118,7 +133,7 @@ public class TestCase {
             startTime = System.nanoTime();
             //set data number
             data.limit(BIG_COUNT);
-            CppSide.passByteBufferToNative(data);
+            JavaJniPerformanceCompare.passByteBufferToNative(data);
             totalTime += System.nanoTime() - startTime;
 
             assertValue(data, (byte) 1);
@@ -126,28 +141,7 @@ public class TestCase {
             data.clear();
         }
 
-        Log.i(TAG, "passByteBufferToNative , 1K ," + totalTime + ", " + totalTime / SMALL_COUNT);
-    }
-
-    public static void testJavaArrayIterator() {
-        byte[] data = new byte[BIG_COUNT];
-
-        long totalTime = 0;
-        long startTime;
-        for (int i = 0; i < SMALL_COUNT; i++) {
-
-            setValue(data, (byte) 0);
-
-            startTime = System.nanoTime();
-            for (int j = 0; j < BIG_COUNT; j++) {
-                data[j] = (byte) 1;
-            }
-            totalTime += System.nanoTime() - startTime;
-
-            assertValue(data, (byte) 1);
-        }
-
-        Log.i(TAG, "javaArrayIterator(1M) , 1K ," + totalTime + ", " + totalTime / SMALL_COUNT);
+        Log.i(TAG, "passByteBufferToNative(1M) , 1K ," + totalTime + ", " + totalTime / SMALL_COUNT);
     }
 
     public static void testJavaReadDirectBuffer() {
@@ -158,8 +152,8 @@ public class TestCase {
         long startTime;
         for (int i = 0; i < SMALL_COUNT; i++) {
 
-            setValue(javaData, (byte) 1);
-            CppSide.passByteBufferToNative(buffer);
+            setValue(javaData, (byte) 0);
+            JavaJniPerformanceCompare.passByteBufferToNative(buffer);
 
             startTime = System.nanoTime();
             //do the work
@@ -175,7 +169,7 @@ public class TestCase {
 
     public static void testCppBatchMemcpy() {
         long time = System.nanoTime();
-        CppSide.javaBatchMemcpy(BIG_COUNT, SMALL_COUNT);
+        JavaJniPerformanceCompare.javaBatchMemcpy(BIG_COUNT, SMALL_COUNT);
         time = System.nanoTime() - time;
 
         Log.i(TAG, "javaBatchMemcpy(1M) , 1K ," + time + ", " + time / BIG_COUNT);
@@ -183,7 +177,7 @@ public class TestCase {
 
     public static void testJavaBatchArrayCopy() {
         long time = System.nanoTime();
-        CppSide.cppBatchMemcpy(BIG_COUNT, SMALL_COUNT);
+        JavaJniPerformanceCompare.cppBatchMemcpy(BIG_COUNT, SMALL_COUNT);
         time = System.nanoTime() - time;
 
         Log.i(TAG, "cppBatchMemcpy(1M) , 1K ," + time + ", " + time / BIG_COUNT);

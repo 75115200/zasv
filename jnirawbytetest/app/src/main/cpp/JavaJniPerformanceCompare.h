@@ -8,12 +8,12 @@
 
 #include <jni.h>
 
-namespace  CppSide {
+namespace  JavaJniPerformanceCompare {
 
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static int add(int a, int b)
  * Signature: (II)I
  */
@@ -21,7 +21,7 @@ jint add(JNIEnv *env, jclass clazz, jint a, jint b);
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static int batchAdd(int a, int b, int count)
  * Signature: (III)I
  */
@@ -29,7 +29,7 @@ jint batchAdd(JNIEnv *env, jclass clazz, jint a, jint b, jint count);
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void passByteArrayToNative(byte[] data)
  * Signature: ([B)V
  */
@@ -37,7 +37,7 @@ void passByteArrayToNative(JNIEnv *env, jclass clazz, jbyteArray data);
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void passByteBufferToNative(java.nio.ByteBuffer data)
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
@@ -45,11 +45,19 @@ void passByteBufferToNative(JNIEnv *env, jclass clazz, jobject data);
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void cppBatchMemcpy(int size, int count)
  * Signature: (II)V
  */
 void cppBatchMemcpy(JNIEnv *env, jclass clazz, jint size, jint count);
+
+
+/*
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
+ * Method:    public static void cppBatchMemset(int size, int count)
+ * Signature: (II)V
+ */
+void cppBatchMemset(JNIEnv *env, jclass clazz, jint size, jint count);
 
 
 
@@ -59,4 +67,4 @@ void cppBatchMemcpy(JNIEnv *env, jclass clazz, jint size, jint count);
  */
 void registerNativeFunctions(JNIEnv *env);
 
-} //endof namespace CppSide
+} //endof namespace JavaJniPerformanceCompare

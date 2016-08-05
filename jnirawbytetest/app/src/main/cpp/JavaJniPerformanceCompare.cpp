@@ -1,4 +1,4 @@
-#include "CppSide.h"
+#include "JavaJniPerformanceCompare.h"
 #include <cstring>
 
 #ifdef DEBUG
@@ -21,12 +21,12 @@
 
 
 //change to whatever you like
-#define LOG_TAG "CppSide"
+#define LOG_TAG "JavaJniPerformanceCompare"
 
-namespace CppSide {
+namespace JavaJniPerformanceCompare {
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static int add(int a, int b)
  * Signature: (II)I
  */
@@ -36,7 +36,7 @@ jint add(JNIEnv *env, jclass clazz, jint a, jint b) {
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static int batchAdd(int a, int b, int count)
  * Signature: (III)I
  */
@@ -50,7 +50,7 @@ jint batchAdd(JNIEnv *env, jclass clazz, jint a, jint b, jint count) {
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void passByteArrayToNative(byte[] data)
  * Signature: ([B)V
  */
@@ -58,26 +58,26 @@ void passByteArrayToNative(JNIEnv *env, jclass clazz, jbyteArray data) {
     jboolean isCopy;
     const jint length = env->GetArrayLength(data);
     jbyte *arr = env->GetByteArrayElements(data, &isCopy);
-    std::memset(arr, sizeof(jbyte), length);
+    std::memset(arr, 1, length);
     env->ReleaseByteArrayElements(data, arr, 0);
     LOGV("GetByteArrayElements isCopy %s", (isCopy ? "true" : "false"));
 }
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void passByteBufferToNative(java.nio.ByteBuffer data)
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
 void passByteBufferToNative(JNIEnv *env, jclass clazz, jobject data) {
     jbyte *arr = static_cast<jbyte *>(env->GetDirectBufferAddress(data));
     jlong length = env->GetDirectBufferCapacity(data);
-    std::memset(arr, sizeof(jbyte), length);
+    std::memset(arr, 1, length);
 }
 
 
 /*
- * Class:     com_young_jnirawbytetest_CppSide
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void cppBatchMemcpy(int size, int count)
  * Signature: (II)V
  */
@@ -89,6 +89,20 @@ void cppBatchMemcpy(JNIEnv *env, jclass clazz, jint size, jint count) {
     }
     delete[] src;
     delete[] dst;
+}
+
+
+/*
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
+ * Method:    public static void cppBatchMemset(int size, int count)
+ * Signature: (II)V
+ */
+void cppBatchMemset(JNIEnv *env, jclass clazz, jint size, jint count) {
+    char *data = new char[size];
+    for (int i = 0; i < count; i++) {
+        std::memset(data, 1, size);
+    }
+    delete[] data;
 }
 
 
@@ -117,6 +131,11 @@ static const JNINativeMethod gsNativeMethods[] = {
                 /* method name      */ const_cast<char *>("cppBatchMemcpy"),
                 /* method signature */ const_cast<char *>("(II)V"),
                 /* function pointer */ reinterpret_cast<void *>(cppBatchMemcpy)
+        },
+        {
+                /* method name      */ const_cast<char *>("cppBatchMemset"),
+                /* method signature */ const_cast<char *>("(II)V"),
+                /* function pointer */ reinterpret_cast<void *>(cppBatchMemset)
         }
 };
 static const int gsMethodCount =
@@ -126,12 +145,12 @@ static const int gsMethodCount =
  * register Native functions
  */
 void registerNativeFunctions(JNIEnv *env) {
-    jclass clazz = env->FindClass("com/young/jnirawbytetest/CppSide");
+    jclass clazz = env->FindClass("com/young/jnirawbytetest/JavaJniPerformanceCompare");
     env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);
 }
 
 
-} //endof namespace CppSide
+} //endof namespace JavaJniPerformanceCompare
 
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -140,7 +159,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
                    JNI_VERSION_1_6) != JNI_OK) {
         return -1;
     }
-    CppSide::registerNativeFunctions(env);
+    JavaJniPerformanceCompare::registerNativeFunctions(env);
     return JNI_VERSION_1_6;
 }
 
