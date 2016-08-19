@@ -20,6 +20,13 @@ public class MainActivity extends AppCompatActivity {
                 clean2Test();
             }
         });
+
+        findViewById(R.id.mix).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               mixTest();
+            }
+        });
     }
 
     public static void clean2Test() {
@@ -29,7 +36,20 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     KgeAudioTest.testClean2();
                 } catch (Exception e) {
-                    Log.e(TAG, "runTestCase: ", e);
+                    Log.e(TAG, "clean2Test: ", e);
+                }
+            }
+        }, "AudioTest").start();
+    }
+
+    public static void mixTest() {
+         new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    KgeAudioTest.mixTest();
+                } catch (Exception e) {
+                    Log.e(TAG, "mixTest: ", e);
                 }
             }
         }, "AudioTest").start();

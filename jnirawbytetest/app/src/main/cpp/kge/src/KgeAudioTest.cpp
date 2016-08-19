@@ -1,4 +1,5 @@
 #include "KalaClean2.h"
+#include "KalaMix.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -7,6 +8,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         return -1;
     }
     KalaClean2::registerNativeFunctions(env);
+    KalaMix::registerNativeFunctions(env);
     return JNI_VERSION_1_6;
 }
 

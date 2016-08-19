@@ -21,7 +21,7 @@ public class KalaClean2 {
         return clean2Process(mNativeHandel, inBuffer, size);
     }
 
-    public void destroy() {
+    public void release() {
         destroyClean2(mNativeHandel);
         mNativeHandel = 0;
     }

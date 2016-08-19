@@ -72,6 +72,7 @@ add_library( # Sets the name of the library.
              # file are automatically included.
              src/main/cpp/kge/src/KgeAudioTest.cpp
              src/main/cpp/kge/src/KalaClean2.cpp
+             src/main/cpp/kge/src/KalaMix.cpp
              )
 
 
