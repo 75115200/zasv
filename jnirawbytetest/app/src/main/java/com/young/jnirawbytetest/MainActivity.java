@@ -17,6 +17,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        short[] s = new short[1024 * 1024];
+        s[0] = 0x0102;
+        JavaJniPerformanceCompare.testEndianess(s);
     }
 
     public static void performanceTest() {

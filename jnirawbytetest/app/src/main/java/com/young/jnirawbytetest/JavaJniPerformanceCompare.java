@@ -59,6 +59,21 @@ public class JavaJniPerformanceCompare {
     public static native void passByteArrayToNative(@NonNull byte[] data);
 
     /**
+     * pass 0 write 1 and return
+     *
+     * @param data
+     */
+    @NativeCode({
+            "jboolean isCopy;",
+            "const jint length = env->GetArrayLength(data);",
+            "jshort *arr = env->GetShortArrayElements(data, &isCopy);",
+            "jshort s = arr[0];",
+            "env->ReleaseShortArrayElements(data, arr, 0);",
+            "LOGV(\"GetShortArrayElements isCopy %s h:%d l:%d\", (isCopy ? \"true\" : \"false\"), (0xff00 & s), (0x00ff & s));",
+    })
+    public static native void testEndianess(@NonNull short[] data);
+
+    /**
      * pass an empty DirectByteBuffer to native, and fill with 1.
      *
      * @param data

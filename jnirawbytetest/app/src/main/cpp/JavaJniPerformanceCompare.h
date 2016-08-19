@@ -38,6 +38,14 @@ void passByteArrayToNative(JNIEnv *env, jclass clazz, jbyteArray data);
 
 /*
  * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
+ * Method:    public static void testEndianess(short[] data)
+ * Signature: ([S)V
+ */
+void testEndianess(JNIEnv *env, jclass clazz, jshortArray data);
+
+
+/*
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void passByteBufferToNative(java.nio.ByteBuffer data)
  * Signature: (Ljava/nio/ByteBuffer;)V
  */

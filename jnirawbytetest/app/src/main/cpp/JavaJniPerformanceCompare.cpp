@@ -2,9 +2,7 @@
 #include <cstring>
 
 #ifdef DEBUG
-
 #include <android/log.h>
-
 #define LOGV(...)   __android_log_print((int)ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define LOGD(...)   __android_log_print((int)ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define LOGI(...)   __android_log_print((int)ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -31,7 +29,7 @@ namespace JavaJniPerformanceCompare {
  * Signature: (II)I
  */
 jint add(JNIEnv *env, jclass clazz, jint a, jint b) {
-    return a + b;
+        return a + b;
 }
 
 
@@ -41,9 +39,9 @@ jint add(JNIEnv *env, jclass clazz, jint a, jint b) {
  * Signature: (III)I
  */
 jint batchAdd(JNIEnv *env, jclass clazz, jint a, jint b, jint count) {
-    jint c = 0;
+        jint c = 0;
     for (jint i = 0; i < count; ++i) {
-        c += a + b;
+       c += a + b;
     }
     return c;
 }
@@ -55,7 +53,7 @@ jint batchAdd(JNIEnv *env, jclass clazz, jint a, jint b, jint count) {
  * Signature: ([B)V
  */
 void passByteArrayToNative(JNIEnv *env, jclass clazz, jbyteArray data) {
-    jboolean isCopy;
+        jboolean isCopy;
     const jint length = env->GetArrayLength(data);
     jbyte *arr = env->GetByteArrayElements(data, &isCopy);
     std::memset(arr, 1, length);
@@ -66,11 +64,26 @@ void passByteArrayToNative(JNIEnv *env, jclass clazz, jbyteArray data) {
 
 /*
  * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
+ * Method:    public static void testEndianess(short[] data)
+ * Signature: ([S)V
+ */
+void testEndianess(JNIEnv *env, jclass clazz, jshortArray data) {
+        jboolean isCopy;
+    const jint length = env->GetArrayLength(data);
+    jshort *arr = env->GetShortArrayElements(data, &isCopy);
+    jshort s = arr[0];
+    env->ReleaseShortArrayElements(data, arr, 0);
+    LOGV("GetShortArrayElements isCopy %s h:%d l:%d", (isCopy ? "true" : "false"), (0xff00 & s), (0x00ff & s));
+}
+
+
+/*
+ * Class:     com_young_jnirawbytetest_JavaJniPerformanceCompare
  * Method:    public static void passByteBufferToNative(java.nio.ByteBuffer data)
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
 void passByteBufferToNative(JNIEnv *env, jclass clazz, jobject data) {
-    jbyte *arr = static_cast<jbyte *>(env->GetDirectBufferAddress(data));
+        jbyte *arr = static_cast<jbyte *>(env->GetDirectBufferAddress(data));
     jlong length = env->GetDirectBufferCapacity(data);
     std::memset(arr, 1, length);
 }
@@ -82,13 +95,12 @@ void passByteBufferToNative(JNIEnv *env, jclass clazz, jobject data) {
  * Signature: (II)V
  */
 void cppBatchMemcpy(JNIEnv *env, jclass clazz, jint size, jint count) {
-    char *src = new char[size];
+        char *src = new char[size];
     char *dst = new char[size];
     for (int i = 0; i < count; i++) {
-        std::memcpy(dst, src, size);
+       std::memcpy(dst, src, size);
     }
-    delete[] src;
-    delete[] dst;
+    delete[] src; delete[] dst;
 }
 
 
@@ -98,48 +110,49 @@ void cppBatchMemcpy(JNIEnv *env, jclass clazz, jint size, jint count) {
  * Signature: (II)V
  */
 void cppBatchMemset(JNIEnv *env, jclass clazz, jint size, jint count) {
-    char *data = new char[size];
+        char *data = new char[size];
     for (int i = 0; i < count; i++) {
-        std::memset(data, 1, size);
+       std::memset(data, 1, size);
     }
     delete[] data;
 }
 
 
+
+
 static const JNINativeMethod gsNativeMethods[] = {
-        {
-                /* method name      */ const_cast<char *>("add"),
-                /* method signature */ const_cast<char *>("(II)I"),
-                /* function pointer */ reinterpret_cast<void *>(add)
-        },
-        {
-                /* method name      */ const_cast<char *>("batchAdd"),
-                /* method signature */ const_cast<char *>("(III)I"),
-                /* function pointer */ reinterpret_cast<void *>(batchAdd)
-        },
-        {
-                /* method name      */ const_cast<char *>("passByteArrayToNative"),
-                /* method signature */ const_cast<char *>("([B)V"),
-                /* function pointer */ reinterpret_cast<void *>(passByteArrayToNative)
-        },
-        {
-                /* method name      */ const_cast<char *>("passByteBufferToNative"),
-                /* method signature */ const_cast<char *>("(Ljava/nio/ByteBuffer;)V"),
-                /* function pointer */ reinterpret_cast<void *>(passByteBufferToNative)
-        },
-        {
-                /* method name      */ const_cast<char *>("cppBatchMemcpy"),
-                /* method signature */ const_cast<char *>("(II)V"),
-                /* function pointer */ reinterpret_cast<void *>(cppBatchMemcpy)
-        },
-        {
-                /* method name      */ const_cast<char *>("cppBatchMemset"),
-                /* method signature */ const_cast<char *>("(II)V"),
-                /* function pointer */ reinterpret_cast<void *>(cppBatchMemset)
-        }
+    {
+        /* method name      */ const_cast<char *>("add"),
+        /* method signature */ const_cast<char *>("(II)I"),
+        /* function pointer */ reinterpret_cast<void *>(add)
+    },    {
+        /* method name      */ const_cast<char *>("batchAdd"),
+        /* method signature */ const_cast<char *>("(III)I"),
+        /* function pointer */ reinterpret_cast<void *>(batchAdd)
+    },    {
+        /* method name      */ const_cast<char *>("passByteArrayToNative"),
+        /* method signature */ const_cast<char *>("([B)V"),
+        /* function pointer */ reinterpret_cast<void *>(passByteArrayToNative)
+    },    {
+        /* method name      */ const_cast<char *>("testEndianess"),
+        /* method signature */ const_cast<char *>("([S)V"),
+        /* function pointer */ reinterpret_cast<void *>(testEndianess)
+    },    {
+        /* method name      */ const_cast<char *>("passByteBufferToNative"),
+        /* method signature */ const_cast<char *>("(Ljava/nio/ByteBuffer;)V"),
+        /* function pointer */ reinterpret_cast<void *>(passByteBufferToNative)
+    },    {
+        /* method name      */ const_cast<char *>("cppBatchMemcpy"),
+        /* method signature */ const_cast<char *>("(II)V"),
+        /* function pointer */ reinterpret_cast<void *>(cppBatchMemcpy)
+    },    {
+        /* method name      */ const_cast<char *>("cppBatchMemset"),
+        /* method signature */ const_cast<char *>("(II)V"),
+        /* function pointer */ reinterpret_cast<void *>(cppBatchMemset)
+    }
 };
 static const int gsMethodCount =
-        sizeof(gsNativeMethods) / sizeof(JNINativeMethod);
+    sizeof(gsNativeMethods) / sizeof(JNINativeMethod);
 
 /*
  * register Native functions
@@ -150,12 +163,13 @@ void registerNativeFunctions(JNIEnv *env) {
 }
 
 
+
 } //endof namespace JavaJniPerformanceCompare
 
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
-    if (vm->GetEnv(reinterpret_cast<void **>(&env),
+    if (vm->GetEnv(reinterpret_cast<void**>(&env),
                    JNI_VERSION_1_6) != JNI_OK) {
         return -1;
     }
