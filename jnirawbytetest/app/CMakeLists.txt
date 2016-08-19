@@ -3,6 +3,7 @@
 # value of 3.4.0 or lower.
 
 cmake_minimum_required(VERSION 3.4.1)
+set(CMAKE_VERBOSE_MAKEFILE on)
 
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
@@ -44,3 +45,41 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        $\{log-lib} )
+
+
+
+# ============ audio ===============
+set(jniLibs_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs)
+
+add_library(lib_audio_base SHARED IMPORTED)
+set_target_properties(lib_audio_base PROPERTIES IMPORTED_LOCATION
+    ${jniLibs_DIR}/${ANDROID_ABI}/libaudiobase_v7a.so)
+
+add_library(lib_audio_process SHARED IMPORTED)
+set_target_properties(lib_audio_process PROPERTIES IMPORTED_LOCATION
+    ${jniLibs_DIR}/${ANDROID_ABI}/libwebrtc_audio_preprocessing_v7a.so)
+
+include_directories(src/main/cpp/kge/include)
+
+add_library( # Sets the name of the library.
+             audio-test
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             # Associated headers in the same location as their source
+             # file are automatically included.
+             src/main/cpp/kge/src/KgeAudioTest.cpp
+             src/main/cpp/kge/src/KalaClean2.cpp
+             )
+
+
+target_link_libraries(
+                       audio-test
+                       log
+                       lib_audio_base
+                       lib_audio_process
+                       )
+
+
