@@ -83,6 +83,6 @@ public class KgeAudioTest {
         player.release();
         mix.release();
         IOUtils.close(bgmIn);
-        IOUtils.close(vocalRead);
+        IOUtils.close(vocalIn);
     }
 }
