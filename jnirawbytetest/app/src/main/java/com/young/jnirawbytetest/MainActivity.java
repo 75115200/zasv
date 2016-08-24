@@ -1,19 +1,32 @@
 package com.young.jnirawbytetest;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
+    Thread mRunningThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mRunningThread != null) {
+                    mRunningThread.interrupt();
+                }
+            }
+        });
+
         findViewById(R.id.clean2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -27,9 +40,30 @@ public class MainActivity extends AppCompatActivity {
                mixTest();
             }
         });
+
+        final Spinner s = (Spinner) findViewById(R.id.shift_spinner);
+        s.setAdapter(new ArrayAdapter<>(
+                MainActivity.this,
+                android.R.layout.simple_list_item_1,
+                new String[] {
+                        "EFFECT",
+                        "SOPRANO",
+                        "BASSO",
+                        "BABY",
+                        "AUTOTUNE",
+                        "METAL",
+                        "CHORUS"
+                }));
+        findViewById(R.id.voice_shift).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                voiceShiftTest(s.getSelectedItemPosition());
+            }
+        });
     }
 
-    public static void clean2Test() {
+    public void clean2Test() {
+        mRunningThread =
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -39,10 +73,12 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "clean2Test: ", e);
                 }
             }
-        }, "AudioTest").start();
+        }, "AudioTest");
+        mRunningThread.start();
     }
 
-    public static void mixTest() {
+    public void mixTest() {
+        mRunningThread =
          new Thread(new Runnable() {
             @Override
             public void run() {
@@ -52,6 +88,22 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "mixTest: ", e);
                 }
             }
-        }, "AudioTest").start();
+        }, "AudioTest");
+        mRunningThread.start();
+    }
+
+    public void voiceShiftTest(final int typeId) {
+        mRunningThread =
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    KgeAudioTest.voiceShiftTest(typeId);
+                } catch (Exception e) {
+                    Log.e(TAG, "mixTest: ", e);
+                }
+            }
+        }, "VoiceShift");
+        mRunningThread.start();
     }
 }

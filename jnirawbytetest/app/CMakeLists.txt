@@ -60,6 +60,9 @@ set_target_properties(lib_audio_process PROPERTIES IMPORTED_LOCATION
     ${jniLibs_DIR}/${ANDROID_ABI}/libwebrtc_audio_preprocessing_v7a.so)
 
 include_directories(src/main/cpp/kge/include)
+file(GLOB KALA_SRC
+             src/main/cpp/kge/src/*.cpp
+             )
 
 add_library( # Sets the name of the library.
              audio-test
@@ -70,9 +73,7 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              # Associated headers in the same location as their source
              # file are automatically included.
-             src/main/cpp/kge/src/KgeAudioTest.cpp
-             src/main/cpp/kge/src/KalaClean2.cpp
-             src/main/cpp/kge/src/KalaMix.cpp
+             ${KALA_SRC}
              )
 
 
