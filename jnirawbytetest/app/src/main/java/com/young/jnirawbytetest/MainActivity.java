@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int t = 0;
                 try {
-                    Integer.parseInt(toneVal.getText().toString());
+                    t = Integer.parseInt(toneVal.getText().toString());
                 } catch (NumberFormatException e) {
                     //fuck
                 }

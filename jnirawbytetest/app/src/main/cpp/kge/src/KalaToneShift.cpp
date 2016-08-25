@@ -44,6 +44,7 @@ jlong nativeCreate(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount
  */
 jint setShiftValue(JNIEnv *env, jclass clazz, jlong handle, jint shiftVal) {
     CToneShift *ins = reinterpret_cast<CToneShift *>(handle);
+    LOGV("%s %d", __FUNCTION__, shiftVal);
     return ins->SetShiftValue(shiftVal);
 }
 
@@ -56,6 +57,7 @@ jint process(JNIEnv *env, jclass clazz, jlong handel, jbyteArray inBuf, jint inS
              jbyteArray outBuf, jint outSize) {
     CToneShift *ins = reinterpret_cast<CToneShift *>(handel);
     if (ins) {
+        LOGV("p in %d  out %d", inSize, outSize);
         jbyte *in = env->GetByteArrayElements(inBuf, nullptr);
         jbyte *out = env->GetByteArrayElements(outBuf, nullptr);
         jint ret = ins->Process(
