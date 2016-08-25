@@ -50,7 +50,7 @@ jint clean2Process(JNIEnv *env, jclass clazz, jlong handel, jbyteArray inBuffer,
 
     jint ret = ins->Process(reinterpret_cast<char*>(buffer), size);
 
-    LOGV("process size %d", size);
+    LOGV("process size %d isCopy %s", size, isCopy == JNI_TRUE ? "true" : "false");
 
     env->ReleaseByteArrayElements(inBuffer, buffer, 0);
 

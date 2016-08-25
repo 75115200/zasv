@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
@@ -41,6 +42,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final EditText toneVal = (EditText) findViewById(R.id.tone_val);
+
+        findViewById(R.id.tone).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int t = 0;
+                try {
+                    Integer.parseInt(toneVal.getText().toString());
+                } catch (NumberFormatException e) {
+                    //fuck
+                }
+                toneTest(t);
+            }
+        });
+
         final Spinner s = (Spinner) findViewById(R.id.shift_spinner);
         s.setAdapter(new ArrayAdapter<>(
                 MainActivity.this,
@@ -74,6 +90,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, "AudioTest");
+        mRunningThread.start();
+    }
+
+
+    public void toneTest(final int toneVal) {
+        mRunningThread =
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.testTone(toneVal);
+                        } catch (Exception e) {
+                            Log.e(TAG, "tone: ", e);
+                        }
+                    }
+                }, "ToneTest");
         mRunningThread.start();
     }
 

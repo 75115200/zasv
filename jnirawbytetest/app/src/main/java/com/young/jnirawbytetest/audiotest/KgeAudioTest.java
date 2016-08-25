@@ -2,6 +2,7 @@ package com.young.jnirawbytetest.audiotest;
 
 import android.media.AudioFormat;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.young.jenny.annotation.NativeClass;
@@ -12,7 +13,6 @@ import com.young.jnirawbytetest.audiotest.logic.PCMFormat;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.nio.IntBuffer;
 
 /**
  * Author: taylorcyang@tencent.com
@@ -27,6 +27,9 @@ public class KgeAudioTest {
         System.loadLibrary("audio-test");
     }
 
+    public static void loadLib() {
+    }
+
     public static void testClean2() throws  Exception {
         PCMFormat format = new PCMFormat();
         format.sampleRate = 44100;
@@ -39,7 +42,7 @@ public class KgeAudioTest {
 
         byte[] buffer = new byte[bufferSize];
 
-        InputStream in = new BufferedInputStream(new FileInputStream("/sdcard/mono.pcm"));
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO));
         KalaClean2 clean2 = new KalaClean2(44100, 1);
 
         int readLen;
@@ -68,8 +71,8 @@ public class KgeAudioTest {
         final byte[] vocalBuffer = new byte[bufferSize];
         final byte[] outBuffer = new byte[bufferSize];
 
-        InputStream bgmIn = new BufferedInputStream(new FileInputStream("/sdcard/bgm.stereo.pcm"));
-        InputStream vocalIn = new BufferedInputStream(new FileInputStream("/sdcard/haha.stereo.pcm"));
+        InputStream bgmIn = new BufferedInputStream(new FileInputStream(PCM.STEREO_MUSIC));
+        InputStream vocalIn = new BufferedInputStream(new FileInputStream(PCM.STEREO));
 
         final KalaMix mix = new KalaMix(format.sampleRate, 2);
 
@@ -125,17 +128,50 @@ public class KgeAudioTest {
         PCMAudioPlayer p = new PCMAudioPlayer(format);
         Bundle outParam = new Bundle();
 
-        InputStream in = new BufferedInputStream(new FileInputStream("/sdcard/haha.stereo.pcm"));
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.STEREO));
 
         voiceShift.setTypeId(typeId);
 
+        long start = SystemClock.elapsedRealtime();
         while (!Thread.interrupted() && in.read(buffer, 0, bufferSize) > 0) {
             final int outLen = voiceShift.process(buffer, bufferSize, outbuf, outBufferSize);
             p.write(outbuf, 0, outLen, outParam);
-            Log.i(TAG, "voiceShiftTest: outLen=" + outLen);
+            Log.i(TAG, "voiceShiftTest: inLen=" + bufferSize + " outLen=" + outLen);
         }
 
+        Log.i(TAG, "voiceShiftTest: runTime " + (SystemClock.elapsedRealtime() - start));
+
         voiceShift.release();
+        IOUtils.close(in);
+    }
+
+    public static void testTone(int toneVal) throws Exception {
+        PCMFormat format = new PCMFormat();
+        format.sampleRate = 44100;
+        format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
+        format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
+        final int bufferSize = format.bufferSize << 2;
+        PCMAudioPlayer player = new PCMAudioPlayer(format);
+        Bundle param = new Bundle();
+
+        byte[] buffer = new byte[bufferSize];
+        byte[] outBuffer = new byte[bufferSize];
+
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO));
+        KalaToneShift tone = new KalaToneShift(44100, 1);
+
+        tone.setShiftValue(toneVal);
+
+        int readLen;
+        while (!Thread.interrupted() &&
+                (readLen = in.read(buffer, 0, bufferSize)) > 0) {
+            int size = tone.process(buffer, bufferSize, outBuffer, bufferSize);
+            player.write(outBuffer, 0, size, param);
+        }
+
+        player.release();
+        tone.release();
         IOUtils.close(in);
     }
 }

@@ -52,6 +52,32 @@
             />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/tone"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="toneShift"
+            android:textSize="22sp"
+            />
+
+        <EditText
+            android:id="@+id/tone_val"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:hint="[-12, 12]"
+            android:gravity="center"
+            />
+
+    </LinearLayout>
     <Button
         android:id="@+id/stop"
         android:layout_width="match_parent"
@@ -59,6 +85,18 @@
         android:textAllCaps="false"
         android:text="stop it"
         android:textSize="22sp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@android:color/black"
+        />
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        class="com.young.jnirawbytetest.audiotest.TestAudioEffectFragment"
         />
 
 </LinearLayout>
