@@ -76,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
                 voiceShiftTest(s.getSelectedItemPosition());
             }
         });
+
+        findViewById(R.id.gain).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gain();
+            }
+        });
     }
 
     public void clean2Test() {
@@ -115,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    KgeAudioTest.mixTest();
+                    KgeAudioTest.mixTest(false);
                 } catch (Exception e) {
                     Log.e(TAG, "mixTest: ", e);
                 }
@@ -131,6 +138,21 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 try {
                     KgeAudioTest.voiceShiftTest(typeId);
+                } catch (Exception e) {
+                    Log.e(TAG, "mixTest: ", e);
+                }
+            }
+        }, "VoiceShift");
+        mRunningThread.start();
+    }
+
+    public void gain() {
+        mRunningThread =
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    KgeAudioTest.testGain();
                 } catch (Exception e) {
                     Log.e(TAG, "mixTest: ", e);
                 }

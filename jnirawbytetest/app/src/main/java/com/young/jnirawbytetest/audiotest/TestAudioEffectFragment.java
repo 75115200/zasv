@@ -66,7 +66,6 @@ public class TestAudioEffectFragment extends Fragment {
         v.findViewById(R.id.process_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mChannelCount = 1;
                 processPCMFile(filePath);
             }
         });
@@ -80,12 +79,11 @@ public class TestAudioEffectFragment extends Fragment {
         int channelFormat = mChannelCount == 1
                 ? AudioFormat.CHANNEL_OUT_MONO
                 : AudioFormat.CHANNEL_OUT_STEREO;
+
         mOutputBufferSize = AudioTrack.getMinBufferSize(
                 mSampleRate,
                 channelFormat,
                 AudioFormat.ENCODING_PCM_16BIT) * 2;
-
-        mOutputBufferSize = 384 * 2;
 
         mTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
                                 mSampleRate,
@@ -98,6 +96,7 @@ public class TestAudioEffectFragment extends Fragment {
         mVoiceShiftPtr = createVoiceShift(mSampleRate, mChannelCount);
         mVolumeScalarPtr = createVolumeScalar(mSampleRate, mChannelCount);
         mGetVolumePtr = createGetVolume();
+
         mAutoGainPtr = createAutoGain(mSampleRate, mChannelCount);
     }
 
@@ -118,7 +117,7 @@ public class TestAudioEffectFragment extends Fragment {
                     fis = new FileInputStream(f);
                     int readCount = 0;
                     mTrack.play();
-                    while ((readCount = fis.read(bufferA)) > 0) {
+                    while ((readCount = fis.read(bufferA, 0, mOutputBufferSize)) > 0) {
                         int result = getVolume(mGetVolumePtr, bufferA, readCount);
                         Log.d(TAG, "volume is " + result);
 
@@ -128,7 +127,9 @@ public class TestAudioEffectFragment extends Fragment {
                         }
                         doReverb4(mReverbPtr, input1, bufferA, readCount, bufferB, readCount);
                         doVoiceShift(mVoiceShiftPtr, input2, bufferB, readCount, bufferA, readCount);
+
                         mTrack.write(bufferA, 0, readCount);
+
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "processPCMFile() fail", e);

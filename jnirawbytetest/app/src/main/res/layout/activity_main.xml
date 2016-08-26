@@ -1,102 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.young.jnirawbytetest.MainActivity"
+
     >
 
-    <Button
-        android:id="@+id/clean2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:text="clean2"
-        android:textSize="22sp"
-        />
-
-    <Button
-        android:id="@+id/mix"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:text="mix"
-        android:textSize="22sp"
-        />
-
     <LinearLayout
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.young.jnirawbytetest.MainActivity"
         >
 
         <Button
-            android:id="@+id/voice_shift"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:id="@+id/clean2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAllCaps="false"
-            android:text="voice shift"
+            android:text="clean2"
             android:textSize="22sp"
             />
-
-        <Spinner
-            android:id="@+id/shift_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
 
         <Button
-            android:id="@+id/tone"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:id="@+id/mix"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAllCaps="false"
-            android:text="toneShift"
+            android:text="mix"
             android:textSize="22sp"
             />
 
-        <EditText
-            android:id="@+id/tone_val"
-            android:layout_width="80dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberSigned"
-            android:hint="[-12, 12]"
-            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/voice_shift"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAllCaps="false"
+                android:text="voice shift"
+                android:textSize="22sp"
+                />
+
+            <Spinner
+                android:id="@+id/shift_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/tone"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textAllCaps="false"
+                android:text="toneShift"
+                android:textSize="22sp"
+                />
+
+            <EditText
+                android:id="@+id/tone_val"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned"
+                android:hint="[-12, 12]"
+                android:gravity="center"
+                />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/gain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="auto gain"
+            android:textSize="22sp"
+            />
+
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="stop it"
+            android:textSize="22sp"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/black"
+            />
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            class="com.young.jnirawbytetest.audiotest.TestAudioEffectFragment"
+            tools:layout="@layout/audio_effect"
             />
 
     </LinearLayout>
-    <Button
-        android:id="@+id/stop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:text="stop it"
-        android:textSize="22sp"
-        />
+</ScrollView>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@android:color/black"
-        />
-
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        class="com.young.jnirawbytetest.audiotest.TestAudioEffectFragment"
-        />
-
-</LinearLayout>

@@ -41,6 +41,6 @@ void destroyClean2(JNIEnv *env, jobject thiz, jlong handel);
 /*
  * register Native functions
  */
-void registerNativeFunctions(JNIEnv *env);
+bool registerNativeFunctions(JNIEnv *env);
 
 } //endof namespace KalaClean2

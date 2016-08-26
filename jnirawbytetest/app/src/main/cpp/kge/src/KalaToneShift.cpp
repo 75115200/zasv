@@ -79,6 +79,9 @@ jint process(JNIEnv *env, jclass clazz, jlong handel, jbyteArray inBuf, jint inS
  */
 void release(JNIEnv *env, jclass clazz, jlong handel) {
     CToneShift *ins = reinterpret_cast<CToneShift *>(handel);
+    if (ins) {
+        ins->Uninit();
+    }
     delete ins;
 }
 

@@ -21,8 +21,10 @@
 
 
 
+
 //change to whatever you like
-#define LOG_TAG "KalaClean2"
+constexpr auto LOG_TAG = "KalaClean2";
+constexpr auto FULL_CLASS_NAME = "com/young/jnirawbytetest/audiotest/KalaClean2";
 
 namespace KalaClean2 {
 
@@ -93,9 +95,9 @@ static const int gsMethodCount =
 /*
  * register Native functions
  */
-void registerNativeFunctions(JNIEnv *env) {
-    jclass clazz = env->FindClass("com/young/jnirawbytetest/audiotest/KalaClean2");
-    env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);
+bool registerNativeFunctions(JNIEnv *env) {
+    jclass clazz = env->FindClass(FULL_CLASS_NAME);
+    return clazz && !env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);
 }
 
 

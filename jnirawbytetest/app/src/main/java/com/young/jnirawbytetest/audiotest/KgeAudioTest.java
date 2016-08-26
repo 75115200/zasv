@@ -24,10 +24,11 @@ import java.io.InputStream;
 public class KgeAudioTest {
     private static final String TAG = "KgeAudioTest";
     static {
-        System.loadLibrary("audio-test");
+        loadLib();
     }
 
     public static void loadLib() {
+        System.loadLibrary("audio-test");
     }
 
     public static void testClean2() throws  Exception {
@@ -57,11 +58,15 @@ public class KgeAudioTest {
         IOUtils.close(in);
     }
 
-    public static void mixTest() throws Exception {
+    public static void mixTest(boolean stereo) throws Exception {
         PCMFormat format = new PCMFormat();
         format.sampleRate = 44100;
         format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-        format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+        if (stereo) {
+            format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+        } else {
+            format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
+        }
         format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
         final int bufferSize = format.bufferSize << 2;
         PCMAudioPlayer player = new PCMAudioPlayer(format);
@@ -71,8 +76,10 @@ public class KgeAudioTest {
         final byte[] vocalBuffer = new byte[bufferSize];
         final byte[] outBuffer = new byte[bufferSize];
 
-        InputStream bgmIn = new BufferedInputStream(new FileInputStream(PCM.STEREO_MUSIC));
-        InputStream vocalIn = new BufferedInputStream(new FileInputStream(PCM.STEREO));
+        InputStream bgmIn = new BufferedInputStream(new FileInputStream(
+                stereo ? PCM.STEREO_MUSIC : PCM.MONO_MUSIC));
+        InputStream vocalIn = new BufferedInputStream(new FileInputStream(
+                stereo ? PCM.STEREO : PCM.MONO));
 
         final KalaMix mix = new KalaMix(format.sampleRate, 2);
 
@@ -135,7 +142,7 @@ public class KgeAudioTest {
         long start = SystemClock.elapsedRealtime();
         while (!Thread.interrupted() && in.read(buffer, 0, bufferSize) > 0) {
             final int outLen = voiceShift.process(buffer, bufferSize, outbuf, outBufferSize);
-            p.write(outbuf, 0, outLen, outParam);
+            p.write(buffer, 0, outLen, outParam);
             Log.i(TAG, "voiceShiftTest: inLen=" + bufferSize + " outLen=" + outLen);
         }
 
@@ -149,7 +156,7 @@ public class KgeAudioTest {
         PCMFormat format = new PCMFormat();
         format.sampleRate = 44100;
         format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-        format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
+        format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
         format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
         final int bufferSize = format.bufferSize << 2;
         PCMAudioPlayer player = new PCMAudioPlayer(format);
@@ -158,7 +165,7 @@ public class KgeAudioTest {
         byte[] buffer = new byte[bufferSize];
         byte[] outBuffer = new byte[bufferSize];
 
-        InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO));
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.STEREO));
         KalaToneShift tone = new KalaToneShift(44100, 1);
 
         tone.setShiftValue(toneVal);
@@ -172,6 +179,33 @@ public class KgeAudioTest {
 
         player.release();
         tone.release();
+        IOUtils.close(in);
+    }
+
+    public static void testGain() throws Exception {
+        PCMFormat format = new PCMFormat();
+        format.sampleRate = 44100;
+        format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
+        format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
+        final int bufferSize = format.bufferSize << 2;
+        PCMAudioPlayer player = new PCMAudioPlayer(format);
+        Bundle param = new Bundle();
+
+        byte[] buffer = new byte[bufferSize];
+
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.STEREO));
+        KalaAudioGain gain = new KalaAudioGain(44100, 2);
+
+        int readLen;
+        while (!Thread.interrupted() &&
+                (readLen = in.read(buffer, 0, bufferSize)) > 0) {
+            int size = gain.process(buffer, readLen);
+            player.write(buffer, 0, size, param);
+        }
+
+        player.release();
+        gain.release();
         IOUtils.close(in);
     }
 }

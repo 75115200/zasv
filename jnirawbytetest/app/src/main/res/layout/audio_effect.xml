@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:hint="0-6"
-        android:text="3"
+        android:text="0"
         android:inputType="number"
         android:textSize="17sp"
         android:gravity="center"
