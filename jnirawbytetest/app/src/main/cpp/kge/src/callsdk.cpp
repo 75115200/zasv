@@ -55,14 +55,14 @@
  // extern begin
 
  ////////////////////////////////////////// GetVolume /////////////////////////////////////
-
+JNIEXPORT
  jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createGetVolume(JNIEnv* env, jobject thiz)
  {
      CKalaVolume * pGetVolume = new CKalaVolume();
      return reinterpret_cast<jlong>(pGetVolume);
  }
 
- void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseGetVolume(JNIEnv* env, jobject thiz, jlong handle)
+ JNIEXPORT void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseGetVolume(JNIEnv* env, jobject thiz, jlong handle)
  {
      CKalaVolume *pGetVolume = reinterpret_cast<CKalaVolume *>(handle);
      if(pGetVolume) {
@@ -70,6 +70,7 @@
      }
  }
 
+ JNIEXPORT
  jint
 Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_getVolume( JNIEnv* env, jobject thiz, jlong handle, jbyteArray data, jint size)
 {
@@ -84,6 +85,7 @@ Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_getVolume( JNIEn
 
 ////////////////////////////////////////// reverb4 ////////////////////////////////////////////
 
+JNIEXPORT
   jint
 Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doReverb4(JNIEnv* env, jobject thiz,
                             jlong handle, jint typeID,
@@ -104,6 +106,7 @@ Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doReverb4(JNIEnv
     return 0;
 }
 
+JNIEXPORT
 jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createReverb4(JNIEnv* env, jobject thiz,
                                                              jint sampleRate, jint channel)
 {
@@ -112,6 +115,7 @@ jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createReve
     return reinterpret_cast<jlong>(pReverb);
 }
 
+JNIEXPORT
 void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseReverb4(JNIEnv* env, jobject thiz, jlong handle)
 {
     CReverb4 *pReverb = reinterpret_cast<CReverb4 *>(handle);
@@ -123,6 +127,7 @@ void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseReve
 
 ////////////////////////////////////////// VoiceShift ////////////////////////////////////////////
 
+JNIEXPORT
   jint
 Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doVoiceShift(JNIEnv* env, jobject thiz,
                             jlong handle, jint typeID,
@@ -143,6 +148,7 @@ Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doVoiceShift(JNI
         return 0;
 }
 
+JNIEXPORT
 jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createVoiceShift(JNIEnv* env, jobject thiz,
                                                              jint sampleRate, jint channel)
 {
@@ -151,6 +157,7 @@ jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createVoic
     return reinterpret_cast<jlong>(pVoiceShift);
 }
 
+JNIEXPORT
 void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseVoiceShift(JNIEnv* env, jobject thiz, jlong handle)
 {
     CVoiceShift *pVoiceShift = reinterpret_cast<CVoiceShift *>(handle);
@@ -162,6 +169,7 @@ void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseVoic
 
 ////////////////////////////////////////// VolumeScalar ////////////////////////////////////////////
 
+JNIEXPORT
   jint
 Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doVolumeScalar(JNIEnv* env, jobject thiz,
                             jlong handle, jint factor,
@@ -180,6 +188,7 @@ Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doVolumeScalar(J
         return 0;
 }
 
+JNIEXPORT
 jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createVolumeScalar(JNIEnv* env, jobject thiz,
                                                              jint sampleRate, jint channel)
 {
@@ -188,6 +197,7 @@ jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createVolu
     return reinterpret_cast<jlong>(pVolumeScalar);
 }
 
+JNIEXPORT
 void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseVolumeScalar(JNIEnv* env, jobject thiz, jlong handle)
 {
     CKalaVolumeScaler *pVolumeScalar = reinterpret_cast<CKalaVolumeScaler *>(handle);
@@ -200,6 +210,7 @@ void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseVolu
 
 ////////////////////////////////////////// AutoGain ////////////////////////////////////////////
 
+JNIEXPORT
   jint
 Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doAutoGain(JNIEnv* env, jobject thiz,
                             jlong handle,
@@ -217,6 +228,7 @@ Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_doAutoGain(JNIEn
         return 0;
 }
 
+JNIEXPORT
 jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createAutoGain(JNIEnv* env, jobject thiz,
                                                              jint sampleRate, jint channel)
 {
@@ -226,6 +238,7 @@ jlong Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_createAuto
     return reinterpret_cast<jlong>(pAutoGain);
 }
 
+JNIEXPORT
 void Java_com_young_jnirawbytetest_audiotest_TestAudioEffectFragment_releaseAutoGain(JNIEnv* env, jobject thiz, jlong handle)
 {
     CautoGain *pAutoGain = reinterpret_cast<CautoGain *>(handle);

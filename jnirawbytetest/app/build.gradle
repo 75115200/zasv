@@ -30,7 +30,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11 -fexceptions"
+                cppFlags "-std=c++11 -fno-exceptions -fvisibility=hidden"
                 abiFilters 'armeabi-v7a'
             }
         }
