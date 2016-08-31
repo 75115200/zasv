@@ -2,10 +2,11 @@ package com.young.jnirawbytetest;
 
 import android.support.annotation.NonNull;
 
-import com.young.jenny.annotation.NativeClass;
-import com.young.jenny.annotation.NativeCode;
 
 import java.nio.ByteBuffer;
+
+import io.github.landerlyoung.jenny.NativeClass;
+import io.github.landerlyoung.jenny.NativeCode;
 
 /**
  * Author: taylorcyang@tencent.com
@@ -16,7 +17,7 @@ import java.nio.ByteBuffer;
 @NativeClass
 public class JavaJniPerformanceCompare {
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("native_lib");
     }
 
     public static int javaAdd(int a, int b) {

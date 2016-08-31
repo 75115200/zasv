@@ -1,7 +1,8 @@
 package com.young.jnirawbytetest.audiotest;
 
-import com.young.jenny.annotation.NativeClass;
-import com.young.jenny.annotation.NativeCode;
+
+import io.github.landerlyoung.jenny.NativeClass;
+import io.github.landerlyoung.jenny.NativeCode;
 
 /**
  * Author: taylorcyang@tencent.com

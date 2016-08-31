@@ -77,6 +77,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ((Spinner) findViewById(R.id.reverb_spinner))
+                .setAdapter(new ArrayAdapter<>(
+                        MainActivity.this,
+                        android.R.layout.simple_list_item_1,
+                        new String[] {
+                                "NO_EFFECT",
+                                "KTV",
+                                "温暖",
+                                "磁性",
+                                "空灵",
+                                "悠远",
+                                "迷幻",
+                                "老唱片",
+                                "无用×",
+                        }));
+
+        findViewById(R.id.reverb).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reverbTest(10 + s.getSelectedItemPosition());
+            }
+        });
+
+        final EditText scaleValue = (EditText) findViewById(R.id.scale_val);
+        findViewById(R.id.volume_scalar).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int t = 0;
+                try {
+                    t = Integer.parseInt(scaleValue.getText().toString());
+                } catch (NumberFormatException e) {
+                    //fuck
+                }
+                volumeScaleTest(t);
+            }
+        });
+
         findViewById(R.id.gain).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,6 +183,35 @@ public class MainActivity extends AppCompatActivity {
         mRunningThread.start();
     }
 
+    public void reverbTest(final int typeId) {
+        mRunningThread =
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.reverbTest(typeId);
+                        } catch (Exception e) {
+                            Log.e(TAG, "mixTest: ", e);
+                        }
+                    }
+                }, "ReverbTest");
+        mRunningThread.start();
+    }
+
+    public void volumeScaleTest(final int scale) {
+        mRunningThread =
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.volumeScaleTest(scale);
+                        } catch (Exception e) {
+                            Log.e(TAG, "scale: ", e);
+                        }
+                    }
+                }, "ScaleTest");
+        mRunningThread.start();
+    }
     public void gain() {
         mRunningThread =
         new Thread(new Runnable() {

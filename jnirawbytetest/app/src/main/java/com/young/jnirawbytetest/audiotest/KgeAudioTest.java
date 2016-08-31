@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.young.jenny.annotation.NativeClass;
+import com.tencent.audioeffect.effect.KalaReverb;
+import com.tencent.audioeffect.effect.KalaVolumeScaler;
 import com.young.jnirawbytetest.IOUtils;
 import com.young.jnirawbytetest.audiotest.logic.PCMAudioPlayer;
 import com.young.jnirawbytetest.audiotest.logic.PCMFormat;
@@ -13,6 +14,8 @@ import com.young.jnirawbytetest.audiotest.logic.PCMFormat;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
+import io.github.landerlyoung.jenny.NativeClass;
 
 /**
  * Author: taylorcyang@tencent.com
@@ -28,7 +31,7 @@ public class KgeAudioTest {
     }
 
     public static void loadLib() {
-        System.loadLibrary("audio-test");
+        System.loadLibrary("audio_test");
     }
 
     public static void testClean2() throws  Exception {
@@ -59,6 +62,7 @@ public class KgeAudioTest {
     }
 
     public static void mixTest(boolean stereo) throws Exception {
+        stereo = true;
         PCMFormat format = new PCMFormat();
         format.sampleRate = 44100;
         format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
@@ -68,35 +72,44 @@ public class KgeAudioTest {
             format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
         }
         format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
-        final int bufferSize = format.bufferSize << 2;
         PCMAudioPlayer player = new PCMAudioPlayer(format);
         Bundle param = new Bundle();
 
-        final byte[] bgmBuffer = new byte[bufferSize];
-        final byte[] vocalBuffer = new byte[bufferSize];
-        final byte[] outBuffer = new byte[bufferSize];
+        final int monoBufferSize = format.bufferSize << 1;
+        final int stereoBufferSize = monoBufferSize << 1;
+
+        final byte[] bgmBuffer = new byte[stereoBufferSize];
+        final byte[] vocalBuffer = new byte[monoBufferSize];
+        final byte[] outBuffer = new byte[stereoBufferSize];
 
         InputStream bgmIn = new BufferedInputStream(new FileInputStream(
                 stereo ? PCM.STEREO_MUSIC : PCM.MONO_MUSIC));
+
+        stereo = false;
         InputStream vocalIn = new BufferedInputStream(new FileInputStream(
                 stereo ? PCM.STEREO : PCM.MONO));
 
-        final KalaMix mix = new KalaMix(format.sampleRate, 2);
+        final KalaMix mix = new KalaMix(
+                format.sampleRate, 2,1
+//                stereo ? 2 : 1,
+//                stereo ? 2 : 1
+        );
 
         int bgmRead;
         int vocalRead;
         while (!Thread.interrupted() &&
-                (bgmRead = bgmIn.read(bgmBuffer, 0, bufferSize)) > 0
-                && (vocalRead = vocalIn.read(vocalBuffer, 0, bufferSize)) > 0) {
-            mix.process(bgmBuffer, bufferSize,
-                        vocalBuffer, bufferSize,
-                        outBuffer, bufferSize);
+                (bgmRead = bgmIn.read(bgmBuffer, 0, stereoBufferSize)) > 0
+                && (vocalRead = vocalIn.read(vocalBuffer, 0, monoBufferSize)) > 0) {
+            mix.process(bgmBuffer, stereoBufferSize,
+                        vocalBuffer, monoBufferSize,
+                        outBuffer, stereoBufferSize);
 
-            player.write(outBuffer, 0, bufferSize, param);
+            player.write(outBuffer, 0, stereoBufferSize, param);
         }
 
         player.release();
         mix.release();
+
         IOUtils.close(bgmIn);
         IOUtils.close(vocalIn);
     }
@@ -206,6 +219,78 @@ public class KgeAudioTest {
 
         player.release();
         gain.release();
+        IOUtils.close(in);
+    }
+
+    public static void reverbTest(int typeId) throws Exception {
+        KalaReverb kalaReverb = new KalaReverb(44100, 1);
+        int idDefault = kalaReverb.getIdDefault();
+
+        int[] out = new int[2];
+        kalaReverb.getIdRange(out);
+        int maxId = out[0];
+        int minId = out[1];
+
+        Log.i(TAG, "reverb: idDefault=" + idDefault);
+        Log.i(TAG, "reverb: idRange=[" + minId + ", " + maxId + "]");
+
+        final int bufferSize = 1024 * 8;
+        byte[] buffer = new byte[bufferSize];
+        final int outBufferSize = bufferSize;
+        byte[] outbuf = new byte[outBufferSize];
+
+        PCMFormat format = new PCMFormat();
+        format.sampleRate = 44100;
+        format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
+        format.bufferSize = bufferSize;//PCMAudioPlayer.getMinBuffeSize(format);
+        PCMAudioPlayer p = new PCMAudioPlayer(format);
+        Bundle outParam = new Bundle();
+
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO_MUSIC));
+
+        kalaReverb.setTypeId(typeId);
+
+        long start = SystemClock.elapsedRealtime();
+        while (!Thread.interrupted() && in.read(buffer, 0, bufferSize) > 0) {
+            //kalaReverb.setTypeId(typeId);
+            final int outLen = kalaReverb.process(buffer, bufferSize, outbuf, outBufferSize);
+            p.write(buffer, 0, outLen, outParam);
+            Log.i(TAG, "reverb: inLen=" + bufferSize + " outLen=" + outLen);
+        }
+
+        Log.i(TAG, "reverb: runTime " + (SystemClock.elapsedRealtime() - start));
+
+        kalaReverb.release();
+        IOUtils.close(in);
+    }
+
+    public static void volumeScaleTest(int scale) throws Exception {
+        PCMFormat format = new PCMFormat();
+        format.sampleRate = 44100;
+        format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
+        format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
+        final int bufferSize = format.bufferSize << 2;
+        PCMAudioPlayer player = new PCMAudioPlayer(format);
+        Bundle param = new Bundle();
+
+        byte[] buffer = new byte[bufferSize];
+
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO_MUSIC));
+        KalaVolumeScaler scaler = new KalaVolumeScaler(44100, 1);
+
+        scaler.setScaleFactor(scale);
+
+        int readLen;
+        while (!Thread.interrupted() &&
+                (readLen = in.read(buffer, 0, bufferSize)) > 0) {
+            int size = scaler.process(buffer, readLen);
+            player.write(buffer, 0, size, param);
+        }
+
+        player.release();
+        scaler.release();
         IOUtils.close(in);
     }
 }

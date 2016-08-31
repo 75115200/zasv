@@ -1,6 +1,7 @@
 package com.young.jnirawbytetest.audiotest;
 
-import com.young.jenny.annotation.NativeClass;
+
+import io.github.landerlyoung.jenny.NativeClass;
 
 /**
  * Author: taylorcyang@tencent.com
@@ -12,8 +13,8 @@ import com.young.jenny.annotation.NativeClass;
 public class KalaMix {
     private long mNativeHandel;
 
-    public KalaMix(int sampleRate, int channel) {
-        mNativeHandel = create(sampleRate, channel);
+    public KalaMix(int sampleRate, int bgmChannelCount, int vocalChannelCount) {
+        mNativeHandel = create(sampleRate, bgmChannelCount, vocalChannelCount);
     }
 
     public int process(byte[] bgm, int bgmSize, byte[] vocal, int vocalSize, byte[] out, int outSize) {
@@ -25,7 +26,7 @@ public class KalaMix {
         mNativeHandel = 0;
     }
 
-    private static native long create(int sampleRate, int channel);
+    private static native long create(int sampleRate,int bgmChannelCount, int vocalChannelCount);
 
     private static native int process(long handel, byte[] bgm, int bgmSize, byte[] vocal, int vocalSize, byte[] out, int outSize);
 

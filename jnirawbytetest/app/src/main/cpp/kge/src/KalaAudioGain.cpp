@@ -26,7 +26,7 @@ namespace KalaAudioGain {
 
 /*
  * Class:     com_young_jnirawbytetest_audiotest_KalaAudioGain
- * Method:    private static long create(int sampleRate, int channelCount)
+ * Method:    private static long create(int sampleRate, int dualChannel)
  * Signature: (II)J
  */
 jlong create(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount) {

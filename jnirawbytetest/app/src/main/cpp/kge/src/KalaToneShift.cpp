@@ -27,7 +27,7 @@ namespace KalaToneShift {
 
 /*
  * Class:     com_young_jnirawbytetest_audiotest_KalaToneShift
- * Method:    private static long nativeCreate(int sampleRate, int channelCount)
+ * Method:    private static long nativeCreate(int sampleRate, int dualChannel)
  * Signature: (II)J
  */
 jlong nativeCreate(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount) {

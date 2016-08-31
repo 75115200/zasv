@@ -1,18 +1,28 @@
 package com.young.jnirawbytetest.audiotest;
 
-import com.young.jenny.annotation.NativeClass;
+
+import io.github.landerlyoung.jenny.NativeClass;
 
 /**
  * Author: taylorcyang@tencent.com
  * Date:   2016-08-26
  * Time:   11:27
  * Life with Passion, Code with Creativity.
+ * <hr>
+ * crash on stereo audio
  */
 @NativeClass
 public class KalaAudioGain {
     private long mNativeHandel;
 
+    /**
+     * @param sampleRate
+     * @param channelCount only support mono channel audio
+     */
     public  KalaAudioGain(int sampleRate, int channelCount) {
+        if (channelCount != 1) {
+            throw new IllegalArgumentException("only support mono channel audio");
+        }
         mNativeHandel = create(sampleRate, channelCount);
     }
 

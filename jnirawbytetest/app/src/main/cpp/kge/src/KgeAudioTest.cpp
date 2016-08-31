@@ -3,6 +3,8 @@
 #include "KalaVoiceShift.h"
 #include "KalaToneShift.h"
 #include "KalaAudioGain.h"
+#include "KalaReverb.h"
+#include "KalaVolumeScaler.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -16,6 +18,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     KalaVoiceShift::registerNativeFunctions(env);
     KalaToneShift::registerNativeFunctions(env);
     KalaAudioGain::registerNativeFunctions(env);
+    KalaReverb::registerNativeFunctions(env);
+    KalaVolumeScaler::registerNativeFunctions(env);
 
     return JNI_VERSION_1_6;
 }
