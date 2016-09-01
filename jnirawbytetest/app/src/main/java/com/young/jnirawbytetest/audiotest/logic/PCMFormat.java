@@ -1,5 +1,6 @@
 package com.young.jnirawbytetest.audiotest.logic;
 
+import android.media.AudioFormat;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,7 +12,7 @@ import java.nio.ByteOrder;
  * Time:   19:38
  * Life with Passion, Code with Creativity.
  */
-public class PCMFormat implements Parcelable {
+public final class PCMFormat implements Parcelable {
     /**
      * usually 44100
      */
@@ -28,7 +29,7 @@ public class PCMFormat implements Parcelable {
      * @see ByteOrder#LITTLE_ENDIAN
      * @see ByteOrder#BIG_ENDIAN
      */
-    public ByteOrder endian;
+    public ByteOrder endian = ByteOrder.LITTLE_ENDIAN;
 
     /**
      * @see android.media.AudioFormat#CHANNEL_IN_MONO
@@ -41,7 +42,25 @@ public class PCMFormat implements Parcelable {
      */
     public int inChannelConfig;
 
+    public int bitRate;
+
     public int bufferSize;
+
+    public int getInChannelCount() {
+        if (inChannelConfig == AudioFormat.CHANNEL_IN_MONO) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    public int getOutChannelCount() {
+        if (outChannelConfig == AudioFormat.CHANNEL_OUT_MONO) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
 
 
     @Override

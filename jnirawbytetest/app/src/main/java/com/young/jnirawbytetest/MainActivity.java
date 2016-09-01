@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,6 +122,15 @@ public class MainActivity extends AppCompatActivity {
                 gain();
             }
         });
+
+        findViewById(R.id.encode_m4a).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AACEncoderTestCase.testEncodeAndMuxerToM4A();
+            }
+        });
+
+
     }
 
     public void clean2Test() {

@@ -156,6 +156,19 @@
             android:textSize="22sp"
             />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/background_dark"
+            />
+
+        <Button
+            android:id="@+id/encode_m4a"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="encode m4a"
+            />
     </LinearLayout>
 </ScrollView>
 
