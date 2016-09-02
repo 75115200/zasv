@@ -40,6 +40,7 @@ include_directories(${cpp_DIR}/kge/include)
 
 file(GLOB KALA_SRC
              ${cpp_DIR}/kge/src/*.cpp
+             ${cpp_DIR}/m4amuxer/*.c
              )
 
 add_library( audio_test

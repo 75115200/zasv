@@ -21,8 +21,7 @@ import java.nio.ByteBuffer;
  * Time:   16:20
  * Life with Passion, Code with Creativity.
  */
-//@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class AACAudioEncoder {
     private static final String TAG = "AACAudioEncoder";
 
@@ -57,9 +56,6 @@ public class AACAudioEncoder {
         mAudioEncoder.start();
 
         mMediaMuxer = aacMuxer;
-//                new MediaMuxer(
-//                AACEncoderTestCase.DOWNLOAD_PATH + "/pp.encode.m4a",
-//                MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         mCodecHelper.fetchBuffers();
     }
 
