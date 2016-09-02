@@ -41,6 +41,11 @@ public class ExampleUnitTest {
         op.rewind();
 
         byte a = (byte) 0b11010001;
+        a <<= 1;
+        System.out.println(a & 0xff);
+
+        a >>>= 1;
+        System.out.println(a & 0xff);
 
         assertEquals(0x123, op.readBits(12));
         assertEquals(0b101, op.readBits(3));
