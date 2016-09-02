@@ -2,6 +2,7 @@ package com.young.jnirawbytetest.audiotest.encoder;
 
 import android.support.annotation.NonNull;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
@@ -11,7 +12,7 @@ import java.nio.ByteOrder;
  * Life with Passion, Code with Creativity.
  */
 public final class BitsOperator {
-    private final byte[] mBits;
+    private final byte[] mBitsData;
     private final int mBitsCount;
     private final ByteOrder mByteOrder;
 
@@ -19,17 +20,20 @@ public final class BitsOperator {
     private int mBitsPosition;
 
     /**
-     * @param bits
+     * @param bitsData
      * @param byteOrder default is {@link ByteOrder#BIG_ENDIAN}
+     *                  for example uint16_t x = 0x0a0b;
+     *                  in big endian it will be [0a, 0b]; eg. 0a in addr 1000, 0b in addr 1001
+     *                  in little endian it will be [0b, 0a]; eg. 0b in addr 1000, 0a in addr 1001
      */
-    public BitsOperator(@NonNull byte[] bits, @NonNull ByteOrder byteOrder) {
-        mBits = bits;
-        mBitsCount = bits.length * 8;
+    public BitsOperator(@NonNull byte[] bitsData, @NonNull ByteOrder byteOrder) {
+        mBitsData = bitsData;
+        mBitsCount = bitsData.length * 8;
         mByteOrder = byteOrder;
     }
 
-    public BitsOperator(@NonNull byte[] bits) {
-        this(bits, ByteOrder.BIG_ENDIAN);
+    public BitsOperator(@NonNull byte[] bitsData) {
+        this(bitsData, ByteOrder.BIG_ENDIAN);
     }
 
     /**
@@ -57,9 +61,11 @@ public final class BitsOperator {
      * @return val
      */
     public int readBits(int bitsLen) {
-        int val = showBits(bitsLen);
-        skipBits(bitsLen);
-        return val;
+        if (mByteOrder == ByteOrder.BIG_ENDIAN) {
+            return readBitsBigEndian(bitsLen);
+        } else {
+            return readBitsLittleEndian(bitsLen);
+        }
     }
 
     /**
@@ -71,11 +77,11 @@ public final class BitsOperator {
         checkBounds(bitsLen);
         checkBitsLen(bitsLen);
 
-        if (mByteOrder == ByteOrder.BIG_ENDIAN) {
-            return showBitsBigEndian(bitsLen);
-        } else {
-            return showBitsLittleEndian(bitsLen);
-        }
+        int val = readBits(bitsLen);
+
+        relativeSeek(-bitsLen);
+
+        return val;
     }
 
     public void seekToBits(int bitsFromStart) {
@@ -85,20 +91,22 @@ public final class BitsOperator {
 
         mBitsPosition = 0;
         mBytePosition = 0;
-        skipBits(bitsFromStart);
+        relativeSeek(bitsFromStart);
     }
 
-    public void skipBits(int bitsCount) {
+    public void relativeSeek(int bitsCount) {
         checkBounds(bitsCount);
 
-        mBitsPosition += bitsCount;
-        mBytePosition = mBitsPosition / 8;
-        mBitsPosition %= 8;
+        int posInBits = mBytePosition * 8 + mBitsPosition;
+        posInBits += bitsCount;
+
+        mBitsPosition = posInBits % 8;
+        mBytePosition = posInBits / 8;
     }
 
     public void alignToNextByte() {
         if (mBitsPosition > 0) {
-            if (mBytePosition == mBits.length) {
+            if (mBytePosition == mBitsData.length) {
                 throw new IndexOutOfBoundsException();
             }
 
@@ -120,7 +128,19 @@ public final class BitsOperator {
     }
 
     public byte[] getBits() {
-        return mBits;
+        return mBitsData;
+    }
+
+    public void clear() {
+        for (int i = 0; i < mBitsData.length; i++) {
+            mBitsData[i] = 0;
+        }
+        rewind();
+    }
+
+    public void rewind() {
+        mBitsPosition = 0;
+        mBytePosition = 0;
     }
 
     //private impl
@@ -134,22 +154,111 @@ public final class BitsOperator {
     private void checkBitsLen(int bitsLen) {
         if (bitsLen > 32) {
             throw new IllegalArgumentException("bitsLen > 32");
+        } else if (bitsLen < 0) {
+            throw new IllegalArgumentException("bitsLen <0");
         }
     }
 
-    private void writeBitsBigEndian(int bitsLen, int data) {
-
-    }
-
+    //lower bits first
     private void writeBitsLittleEndian(int bitsLen, int data) {
+        while (bitsLen > 0) {
+            int bitsToWrite = Math.min(bitsLen, 8 - mBitsPosition);
+            //catch the lowest byte
+            byte val = (byte) (data & 0xff);
+
+            //erase high zero
+            val <<= mBitsPosition;
+            mBitsData[mBytePosition] |= val;
+            data >>>= bitsToWrite;
+
+            bitsLen -= bitsToWrite;
+            relativeSeek(bitsToWrite);
+        }
     }
 
-    private int showBitsBigEndian(int bitsCount) {
-        return 0;
+    //high bits first
+    private void writeBitsBigEndian(int bitsLen, int data) {
+        data <<= (32 - bitsLen);
+
+        while (bitsLen > 0) {
+            int bitsToWrite = Math.min(bitsLen, 8 - mBitsPosition);
+            //catch the highest byte
+            byte val = (byte) ((data >>> (32 - 8)) & 0xff);
+
+            val >>>= mBitsPosition;
+            mBitsData[mBytePosition] |= val;
+
+            data <<= bitsToWrite;
+
+            bitsLen -= bitsToWrite;
+            relativeSeek(bitsToWrite);
+        }
     }
 
-    private int showBitsLittleEndian(int bitsCount) {
-        return 0;
+    private int readBitsLittleEndian(int bitsCount) {
+        int ret = 0;
+
+        int readPos = 0;
+        while (bitsCount > 0) {
+            int bitsToRead = Math.min(bitsCount, 8 - mBitsPosition);
+
+            //catch the valid value
+            byte byteVal = mBitsData[mBytePosition];
+
+            //bit we are use, include the bit before position
+            final int takenBitsCount = bitsCount + mBitsPosition;
+            if (takenBitsCount < 8) {
+                //clear high bits
+                byteVal <<= (8 - takenBitsCount);
+                byteVal >>>= (8 - takenBitsCount);
+            }
+
+            int val = byteVal & 0xff;
+
+            //to normal pos
+            //erase bits before position
+            val >>>= mBitsPosition;
+
+            //to fill the ret data
+            val <<= readPos;
+
+            ret |= val;
+
+            readPos += bitsToRead;
+            bitsCount -= bitsToRead;
+            relativeSeek(bitsToRead);
+        }
+        return ret;
+    }
+
+    private int readBitsBigEndian(int bitsCount) {
+        int ret = 0;
+
+        int readPos = 31;
+        while (bitsCount > 0) {
+            int bitsToRead = Math.min(bitsCount, 8 - mBitsPosition);
+
+            //catch the valid value
+            int val = mBitsData[mBytePosition];
+
+            //to normal pos
+            val >>>= mBitsPosition;
+
+            //we are writing top -> down
+            //move pos down before write
+            readPos -= bitsToRead;
+            //to fill the ret data
+            val <<= readPos;
+
+            ret |= val;
+
+            bitsCount -= bitsToRead;
+            relativeSeek(bitsToRead);
+        }
+
+        //back to normal
+        ret >>>= readPos;
+        return ret;
     }
 
 }
