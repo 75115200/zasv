@@ -61,6 +61,9 @@ public final class BitsOperator {
      * @return val
      */
     public int readBits(int bitsLen) {
+        checkBounds(bitsLen);
+        checkBitsLen(bitsLen);
+
         if (mByteOrder == ByteOrder.BIG_ENDIAN) {
             return readBitsBigEndian(bitsLen);
         } else {
@@ -69,18 +72,14 @@ public final class BitsOperator {
     }
 
     /**
-     * read bits but don't advance bits position
+     * read bits but don't move bits position
      *
      * @see #readBits(int)
      */
     public int showBits(int bitsLen) {
-        checkBounds(bitsLen);
-        checkBitsLen(bitsLen);
-
         int val = readBits(bitsLen);
 
         relativeSeek(-bitsLen);
-
         return val;
     }
 
@@ -106,7 +105,7 @@ public final class BitsOperator {
 
     public void alignToNextByte() {
         if (mBitsPosition > 0) {
-            if (mBytePosition == mBitsData.length) {
+            if (mBytePosition + 1 >= mBitsData.length) {
                 throw new IndexOutOfBoundsException();
             }
 
@@ -183,9 +182,15 @@ public final class BitsOperator {
         while (bitsLen > 0) {
             int bitsToWrite = Math.min(bitsLen, 8 - mBitsPosition);
             //catch the highest byte
-            byte val = (byte) ((data >>> (32 - 8)) & 0xff);
+            byte val = (byte) (data >> (32 - 8));
 
-            val >>>= mBitsPosition;
+            if (bitsToWrite < 8) {
+                val = (byte) ((val & 0xff) >>> (8 - bitsToWrite));
+            }
+
+            //move to write pos
+            //val = (byte) ((val & 0xff) >>> mBitsPosition);
+            val <<= mBitsPosition;
             mBitsData[mBytePosition] |= val;
 
             data <<= bitsToWrite;
@@ -206,18 +211,16 @@ public final class BitsOperator {
             byte byteVal = mBitsData[mBytePosition];
 
             //bit we are use, include the bit before position
-            final int takenBitsCount = bitsCount + mBitsPosition;
+            final int takenBitsCount = bitsToRead + mBitsPosition;
             if (takenBitsCount < 8) {
                 //clear high bits
                 byteVal <<= (8 - takenBitsCount);
-                byteVal >>>= (8 - takenBitsCount);
+                byteVal = (byte) ((byteVal & 0xff) >>> (8 - takenBitsCount));
             }
-
-            int val = byteVal & 0xff;
 
             //to normal pos
             //erase bits before position
-            val >>>= mBitsPosition;
+            int val = (byteVal & 0xff) >>> mBitsPosition;
 
             //to fill the ret data
             val <<= readPos;
@@ -239,10 +242,18 @@ public final class BitsOperator {
             int bitsToRead = Math.min(bitsCount, 8 - mBitsPosition);
 
             //catch the valid value
-            int val = mBitsData[mBytePosition];
+            byte byteVal = mBitsData[mBytePosition];
+
+            int bitsTaken = bitsToRead + mBitsPosition;
+            if (bitsTaken < 8) {
+                //clear high bits
+                byteVal <<= (8 - bitsTaken);
+                byteVal = (byte) ((byteVal & 0xff) >>> (8 - bitsTaken));
+            }
+
 
             //to normal pos
-            val >>>= mBitsPosition;
+            int val = (byteVal & 0xff) >>> mBitsPosition;
 
             //we are writing top -> down
             //move pos down before write
