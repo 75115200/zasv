@@ -3,16 +3,14 @@ package com.young.jnirawbytetest.audiotest.encoder;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.support.annotation.NonNull;
-import android.test.MoreAsserts;
-import android.util.Log;
 
 import com.young.jnirawbytetest.IOUtils;
 
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * Author: taylorcyang@tencent.com
@@ -24,20 +22,23 @@ public class AdtsAACMuxer implements AACMuxer {
     private static final String TAG = "AdtsAACMuxer";
 
     private final OutputStream mOutputStream;
+    private final FileChannel mOutFileChannel;
+    private ByteBuffer mAdtsHeaderByteBuffer;
 
-    private final AdtsHeaderBuilder mAdtsHeaderBuilder;
+    private final AdtsHeaderBuilder mAdtsHeaderBuilder = new AdtsHeaderBuilder();
     private boolean mTrackAdded;
     private boolean mStarted;
 
-    private byte[] mBuffer = new byte[1024 * 8];
+    private byte[] mArrayBuffer = null;
 
     public AdtsAACMuxer(@NonNull String filePath) throws IOException {
-        this(new BufferedOutputStream(new FileOutputStream(filePath)));
+        mOutputStream = null;
+        mOutFileChannel = new FileOutputStream(filePath).getChannel();
     }
 
     public AdtsAACMuxer(@NonNull OutputStream outputStream) {
         mOutputStream = outputStream;
-        mAdtsHeaderBuilder = new AdtsHeaderBuilder();
+        mOutFileChannel = null;
     }
 
     @Override
@@ -63,8 +64,10 @@ public class AdtsAACMuxer implements AACMuxer {
      * @throws IllegalStateException when write aacFrame failed
      */
     @Override
-    public void writeSampleData(int trackIndex, @NonNull ByteBuffer data, @NonNull MediaCodec.BufferInfo bufferInfo)
+    public void writeSampleData(int trackIndex, @NonNull ByteBuffer data,
+                                @NonNull MediaCodec.BufferInfo bufferInfo)
             throws IllegalArgumentException, IllegalStateException {
+
         if (trackIndex != 0) {
             throw new IllegalArgumentException("invalid trackIndex:" + trackIndex);
         }
@@ -73,40 +76,28 @@ public class AdtsAACMuxer implements AACMuxer {
             return;
         }
 
-        final int headerLen = mAdtsHeaderBuilder.getHeaderLength();
         final int dataLen = data.remaining();
-        Log.e(TAG, "before=" + mAdtsHeaderBuilder);
         mAdtsHeaderBuilder.setAudioFrameLength(dataLen, 1);
-        Log.e(TAG, "after =" + mAdtsHeaderBuilder + " exp=" + (7 + dataLen));
-
-        final int bufferLen = headerLen + dataLen;
-        byte[] buffer = getBuffer(bufferLen);
-        System.arraycopy(mAdtsHeaderBuilder.getHeader(), 0, buffer, 0, headerLen);
-        data.get(buffer, headerLen, dataLen);
-
-        int frameLen;
-        BitsOperator op = new BitsOperator(mAdtsHeaderBuilder.getHeader());
-        Log.i(TAG, "SyncWord=" + Integer.toBinaryString(op.readBits(12))
-                + "\nMPEG Version=" + Integer.toBinaryString(op.readBits(1))
-                + "\nLayer=" + Integer.toBinaryString(op.readBits(2))
-                + "\ncrc=" + Integer.toBinaryString(op.readBits(1))
-                + "\nprofile-1=" + Integer.toBinaryString(op.readBits(2))
-                + "\nfreq=" + Integer.toBinaryString(op.readBits(4))
-                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
-                + "\nchannel=" + Integer.toBinaryString(op.readBits(3))
-                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
-                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
-                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
-                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
-                + "\nframeLen=" + Integer.toBinaryString(frameLen = op.readBits(13))
-                /**/ + "--" + frameLen + " exp=" + Integer.toBinaryString(bufferLen) + "--" + bufferLen
-                + "\nbufferFullness=" + Integer.toBinaryString(op.readBits(11))
-                + "\naacFrameCount=" + Integer.toBinaryString(op.readBits(2))
-                + "\nallBits=" + mAdtsHeaderBuilder
-        );
 
         try {
-            mOutputStream.write(buffer, 0, bufferLen);
+            if (mOutFileChannel != null) {
+                if (mAdtsHeaderByteBuffer == null) {
+                    mAdtsHeaderByteBuffer = ByteBuffer.wrap(mAdtsHeaderBuilder.getHeader());
+                }
+                mAdtsHeaderByteBuffer.position(0);
+                mAdtsHeaderByteBuffer.limit(mAdtsHeaderBuilder.getHeaderLength());
+                mOutFileChannel.write(mAdtsHeaderByteBuffer);
+
+                mOutFileChannel.write(data);
+            } else {
+                final int headerLen = mAdtsHeaderBuilder.getHeaderLength();
+                final int bufferLen = headerLen + dataLen;
+                byte[] buffer = getBuffer(bufferLen);
+                System.arraycopy(mAdtsHeaderBuilder.getHeader(), 0, buffer, 0, headerLen);
+                data.get(buffer, headerLen, dataLen);
+
+                mOutputStream.write(buffer, 0, bufferLen);
+            }
         } catch (IOException e) {
             throw new IllegalStateException("write aac frame failed", e);
         }
@@ -121,6 +112,7 @@ public class AdtsAACMuxer implements AACMuxer {
     public void release() {
         mStarted = false;
         IOUtils.close(mOutputStream);
+        IOUtils.close(mOutFileChannel);
     }
 
     @Override
@@ -129,9 +121,9 @@ public class AdtsAACMuxer implements AACMuxer {
     }
 
     private byte[] getBuffer(int size) {
-        if (mBuffer == null || mBuffer.length < size) {
-            mBuffer = new byte[size];
+        if (mArrayBuffer == null || mArrayBuffer.length < size) {
+            mArrayBuffer = new byte[size];
         }
-        return mBuffer;
+        return mArrayBuffer;
     }
 }

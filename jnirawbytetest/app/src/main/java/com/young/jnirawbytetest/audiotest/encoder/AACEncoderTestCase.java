@@ -58,7 +58,7 @@ public class AACEncoderTestCase {
             PCMFormat format = new PCMFormat();
             format.sampleRate = 44100;
             format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
-            format.bitRate = 96 * 1000;
+            format.bitRate = 320 * 1000;
             format.bufferSize = 0b0100_0000__0000_0000;
 
             AACMuxer aacMuxer;
