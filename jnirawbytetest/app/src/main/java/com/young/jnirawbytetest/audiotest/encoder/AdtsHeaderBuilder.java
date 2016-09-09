@@ -70,6 +70,8 @@ public final class AdtsHeaderBuilder {
     public void setFromAudioSpecificConfig(byte[] data) {
         BitsOperator op = new BitsOperator(data);
 
+        mAdts.seekToBits(12).writeBits(1, 0);
+
         int objType = op.readBits(5);
         if (objType == 31) {
             objType += op.readBits(6);
@@ -90,8 +92,8 @@ public final class AdtsHeaderBuilder {
     /**
      * must be called after {@link #setCrcProtection(boolean, short)}
      *
-     * @param aacFrameLength how long this frame is
-     * @param aacFrameCount  how many aac frame it contains. ALWAYS be 1.
+     * @param aacFrameLength how long this adts frame is
+     * @param aacFrameCount  how many aac frame it contains. should ALWAYS be 1.
      */
     public void setAudioFrameLength(int aacFrameLength, int aacFrameCount) {
         aacFrameLength += getHeaderLength();
