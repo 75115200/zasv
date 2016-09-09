@@ -169,6 +169,14 @@
             android:textAllCaps="false"
             android:text="encode m4a"
             />
+
+        <Button
+            android:id="@+id/encode_aac"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="encode aac"
+            />
     </LinearLayout>
 </ScrollView>
 

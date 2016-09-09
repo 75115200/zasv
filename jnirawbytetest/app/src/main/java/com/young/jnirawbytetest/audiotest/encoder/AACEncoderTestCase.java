@@ -8,7 +8,9 @@ import android.util.Log;
 import com.young.jnirawbytetest.audiotest.logic.PCMFormat;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,18 +30,29 @@ public class AACEncoderTestCase {
     private static final String STEREO_PCM = DOWNLOAD_PATH + "/pp.stereo.pcm.raw";
 
     private static final String OUT_PUT_M4A_PATH = DOWNLOAD_PATH + "/pp.encode.m4a";
+    private static final String OUT_PUT_AAC_PATH = DOWNLOAD_PATH + "/pp.encode.aac";
 
     public static void testEncodeAndMuxerToM4A() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                encodeAndMuxer();
+                encodeAndMuxer(true);
             }
         }, TAG).start();
 
     }
 
-    private static void encodeAndMuxer() {
+    public static void testEncodeAndMuxerToAAC() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                encodeAndMuxer(false);
+            }
+        }, TAG).start();
+
+    }
+
+    private static void encodeAndMuxer(boolean isM4a/*or aac*/) {
         try {
             Log.i(TAG, "encodeAndMuxer: start");
             PCMFormat format = new PCMFormat();
@@ -48,7 +61,13 @@ public class AACEncoderTestCase {
             format.bitRate = 96 * 1000;
             format.bufferSize = 0b0100_0000__0000_0000;
 
-            AACMuxer aacMuxer = new DroidM4AMuxer(OUT_PUT_M4A_PATH);
+            AACMuxer aacMuxer;
+            if (isM4a) {
+                aacMuxer = new DroidM4AMuxer(OUT_PUT_M4A_PATH);
+            } else {
+                aacMuxer = new AdtsAACMuxer(new BufferedOutputStream(new FileOutputStream(OUT_PUT_AAC_PATH)));
+            }
+
             AACAudioEncoder encoder = new AACAudioEncoder(format, aacMuxer);
             InputStream in = new BufferedInputStream(new FileInputStream(STEREO_PCM));
 

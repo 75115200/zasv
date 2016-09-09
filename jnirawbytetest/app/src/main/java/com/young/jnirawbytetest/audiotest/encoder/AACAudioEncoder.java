@@ -68,25 +68,28 @@ public class AACAudioEncoder {
      * @return eos
      */
     public boolean writeData(byte[] data, int length, long sampleTimeUs, boolean eos) {
-        while (!fillEncoder(data, length, sampleTimeUs)) {
+        while (!fillEncoder(data, length, sampleTimeUs, eos)) {
             drainEncoder(eos);
         }
         return eos;
     }
 
-    private boolean fillEncoder(byte[] data, int length, long sampleTimeUs) {
-        final int encoderBuferIndex = mAudioEncoder.dequeueInputBuffer(TIMEOUT_MILLIS);
-        ByteBuffer input = mCodecHelper.getInputBuffer(encoderBuferIndex);
+    private boolean fillEncoder(byte[] data, int length, long sampleTimeUs, boolean eos) {
+        int encoderBufferIndex;
+        ByteBuffer input;
 
-        if (input != null) {
-            input.clear();
-            Log.i(TAG, "fillEncoder: writeData len=" + length + " sampleTimeUs=" + sampleTimeUs);
-            input.put(data);
-            mAudioEncoder.queueInputBuffer(encoderBuferIndex, 0, length, sampleTimeUs, 0);
-            return true;
-        } else {
-            return false;
-        }
+        do {
+            drainEncoder(false);
+            encoderBufferIndex = mAudioEncoder.dequeueInputBuffer(TIMEOUT_MILLIS);
+            input = mCodecHelper.getInputBuffer(encoderBufferIndex);
+        } while (input == null);
+
+        input.clear();
+        Log.i(TAG, "fillEncoder: writeData len=" + length + " sampleTimeUs=" + sampleTimeUs);
+        input.put(data);
+        mAudioEncoder.queueInputBuffer(encoderBufferIndex, 0, length, sampleTimeUs,
+                                       eos ? MediaCodec.BUFFER_FLAG_END_OF_STREAM : 0);
+        return true;
     }
 
     /**
@@ -145,8 +148,6 @@ public class AACAudioEncoder {
                     if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                         //eos
                         return true;
-                    } else {
-                        //continue till
                     }
                 }
             }

@@ -20,20 +20,10 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void testLittleEndian() throws Exception {
-        BitsOperator op = new BitsOperator(new byte[8], ByteOrder.LITTLE_ENDIAN);
-
-        run(op);
-    }
-
-    @Test
     public void testBigEndian() throws Exception {
-        BitsOperator op = new BitsOperator(new byte[8]);
+        byte[] data = new byte[8];
+        BitsOperator op = new BitsOperator(data);
 
-        run(op);
-    }
-
-    private void run(BitsOperator op) {
         op.writeBits(12, 0x123);
 
         op.rewind();
@@ -63,6 +53,16 @@ public class ExampleUnitTest {
         assertEquals(0b001, op.readBits(3));
         assertEquals(0b111, op.readBits(3));
         assertEquals(0b100, op.readBits(3));
+
+        data[0] = 0b0001_0010;
+        data[1] = 0b0001_0000;
+
+        op.rewind();
+
+        assertEquals(2, op.readBits(5));
+        assertEquals(4, op.readBits(4));
+        assertEquals(2, op.readBits(4));
+        assertEquals(0, op.readBits(3));
     }
 
 }
