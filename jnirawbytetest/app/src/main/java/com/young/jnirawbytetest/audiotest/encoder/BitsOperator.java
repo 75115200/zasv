@@ -120,7 +120,7 @@ public final class BitsOperator {
         return mBitsData;
     }
 
-    public BitsOperator clear() {
+    public BitsOperator clearAll() {
         for (int i = 0; i < mBitsData.length; i++) {
             mBitsData[i] = 0;
         }
@@ -169,6 +169,17 @@ public final class BitsOperator {
 
             //move to write pos
             val <<= mBitsPosition + 1 - bitsToWrite;
+
+            //clear dst bits before write
+            byte clearMask = -1; //0xffff_ffff_ffff_ffff
+            clearMask <<= 8 - bitsToWrite;
+            clearMask = (byte) ((clearMask & 0xff) >>> (8 - bitsToWrite));
+            clearMask = (byte) (clearMask << (mBitsPosition + 1 - bitsToWrite));
+            clearMask = (byte) ~clearMask;
+
+            mBitsData[mBytePosition] &= clearMask;
+
+
             mBitsData[mBytePosition] |= val;
 
             data <<= bitsToWrite;
@@ -215,4 +226,19 @@ public final class BitsOperator {
         return ret;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : mBitsData) {
+            String str = Integer.toBinaryString(b & 0xff);
+            for (int i = 0; i < 8 - str.length(); i++) {
+                sb.append('0');
+            }
+            sb.append(str);
+
+            sb.insert(sb.length() - 4, "_");
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
 }

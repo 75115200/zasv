@@ -3,6 +3,8 @@ package com.young.jnirawbytetest.audiotest.encoder;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.support.annotation.NonNull;
+import android.test.MoreAsserts;
+import android.util.Log;
 
 import com.young.jnirawbytetest.IOUtils;
 
@@ -19,6 +21,7 @@ import java.nio.ByteBuffer;
  * Life with Passion, Code with Creativity.
  */
 public class AdtsAACMuxer implements AACMuxer {
+    private static final String TAG = "AdtsAACMuxer";
 
     private final OutputStream mOutputStream;
 
@@ -70,13 +73,37 @@ public class AdtsAACMuxer implements AACMuxer {
             return;
         }
 
-        mAdtsHeaderBuilder.setAudioFrameLength(data.remaining(), 1);
-
         final int headerLen = mAdtsHeaderBuilder.getHeaderLength();
-        final int bufferLen = headerLen + data.remaining();
+        final int dataLen = data.remaining();
+        Log.e(TAG, "before=" + mAdtsHeaderBuilder);
+        mAdtsHeaderBuilder.setAudioFrameLength(dataLen, 1);
+        Log.e(TAG, "after =" + mAdtsHeaderBuilder + " exp=" + (7 + dataLen));
+
+        final int bufferLen = headerLen + dataLen;
         byte[] buffer = getBuffer(bufferLen);
         System.arraycopy(mAdtsHeaderBuilder.getHeader(), 0, buffer, 0, headerLen);
-        data.get(buffer, headerLen, data.remaining());
+        data.get(buffer, headerLen, dataLen);
+
+        int frameLen;
+        BitsOperator op = new BitsOperator(mAdtsHeaderBuilder.getHeader());
+        Log.i(TAG, "SyncWord=" + Integer.toBinaryString(op.readBits(12))
+                + "\nMPEG Version=" + Integer.toBinaryString(op.readBits(1))
+                + "\nLayer=" + Integer.toBinaryString(op.readBits(2))
+                + "\ncrc=" + Integer.toBinaryString(op.readBits(1))
+                + "\nprofile-1=" + Integer.toBinaryString(op.readBits(2))
+                + "\nfreq=" + Integer.toBinaryString(op.readBits(4))
+                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
+                + "\nchannel=" + Integer.toBinaryString(op.readBits(3))
+                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
+                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
+                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
+                + "\nomit=" + Integer.toBinaryString(op.readBits(1))
+                + "\nframeLen=" + Integer.toBinaryString(frameLen = op.readBits(13))
+                /**/ + "--" + frameLen + " exp=" + Integer.toBinaryString(bufferLen) + "--" + bufferLen
+                + "\nbufferFullness=" + Integer.toBinaryString(op.readBits(11))
+                + "\naacFrameCount=" + Integer.toBinaryString(op.readBits(2))
+                + "\nallBits=" + mAdtsHeaderBuilder
+        );
 
         try {
             mOutputStream.write(buffer, 0, bufferLen);

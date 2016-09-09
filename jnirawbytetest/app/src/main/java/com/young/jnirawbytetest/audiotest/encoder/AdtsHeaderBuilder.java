@@ -4,6 +4,8 @@ import android.annotation.TargetApi;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.text.LoginFilter;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,6 +20,7 @@ import java.nio.ByteOrder;
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public final class AdtsHeaderBuilder {
+    private static final String TAG = "AdtsHeaderBuilder";
 
     public static final int ADTS_MAX_FRAME_SIZE = (1 << 13) - 1;
 
@@ -100,6 +103,8 @@ public final class AdtsHeaderBuilder {
                             ") > ADTS_MAX_FRAME_SIZE(" + ADTS_MAX_FRAME_SIZE + ")");
         }
 
+        Log.i(TAG, "setAudioFrameLength: frameLen=" + aacFrameLength);
+
         mAdts.seekToBits(30).writeBits(13, aacFrameLength)
              .seekToBits(54).writeBits(2, aacFrameCount);
     }
@@ -125,5 +130,10 @@ public final class AdtsHeaderBuilder {
 
     public byte[] getHeader() {
         return mAdts.getBits();
+    }
+
+    @Override
+    public String toString() {
+        return mAdts.toString();
     }
 }

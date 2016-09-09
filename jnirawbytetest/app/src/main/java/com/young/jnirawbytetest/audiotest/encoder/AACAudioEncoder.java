@@ -160,6 +160,5 @@ public class AACAudioEncoder {
 
         mMediaMuxer.stop();
         mMediaMuxer.release();
-
     }
 }
