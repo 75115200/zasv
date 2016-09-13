@@ -36,10 +36,22 @@ add_library(lib_audio_process SHARED IMPORTED)
 set_target_properties(lib_audio_process PROPERTIES IMPORTED_LOCATION
     ${jniLibs_DIR}/libwebrtc_audio_preprocessing${kge_so_postfix}.so)
 
-include_directories(${cpp_DIR}/kge/include)
+add_library(lib_super_sound SHARED IMPORTED)
+set_target_properties(lib_super_sound PROPERTIES IMPORTED_LOCATION
+    ${jniLibs_DIR}/libSuperSound.so)
+
+include_directories(
+        ${cpp_DIR}/kge/include
+        ${cpp_DIR}/supersound/include
+)
 
 file(GLOB KALA_SRC
              ${cpp_DIR}/kge/src/*.cpp
+
+             ${cpp_DIR}/supersound/src/*.cpp
+
+             ${cpp_DIR}/jni_onload.cpp
+
              #${cpp_DIR}/m4amuxer/*.c
              )
 
@@ -54,5 +66,6 @@ target_link_libraries( audio_test
                        log
                        lib_audio_base
                        lib_audio_process
+                       lib_super_sound
                        )
 

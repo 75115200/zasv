@@ -10,6 +10,7 @@ import android.widget.Spinner;
 
 import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
+import com.young.jnirawbytetest.supersound.SuperSoundWrapper;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.mix).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               mixTest();
+                mixTest();
             }
         });
 
@@ -79,26 +80,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ((Spinner) findViewById(R.id.reverb_spinner))
-                .setAdapter(new ArrayAdapter<>(
-                        MainActivity.this,
-                        android.R.layout.simple_list_item_1,
-                        new String[] {
-                                "NO_EFFECT",
-                                "KTV",
-                                "温暖",
-                                "磁性",
-                                "空灵",
-                                "悠远",
-                                "迷幻",
-                                "老唱片",
-                                "无用×",
-                        }));
+        final Spinner reverbSpinner = ((Spinner) findViewById(R.id.reverb_spinner));
+        reverbSpinner.setAdapter(new ArrayAdapter<>(
+                MainActivity.this,
+                android.R.layout.simple_list_item_1,
+                new String[] {
+                        "NO_EFFECT",
+                        "KTV",
+                        "温暖",
+                        "磁性",
+                        "空灵",
+                        "悠远",
+                        "迷幻",
+                        "老唱片",
+                        "无用×",
+                }));
 
         findViewById(R.id.reverb).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reverbTest(10 + s.getSelectedItemPosition());
+                reverbTest(10 + reverbSpinner.getSelectedItemPosition());
             }
         });
 
@@ -137,21 +138,41 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final Spinner superSoundSpinner = (Spinner) findViewById(R.id.super_sound_spinner);
+
+        superSoundSpinner.setAdapter(new ArrayAdapter<>(
+                MainActivity.this,
+                android.R.layout.simple_list_item_1,
+                new String[] {
+                        "无音效",
+                        "全景环绕",
+                        "超重低音",
+                        "清澈人声",
+                        "现场律动",
+                }
+        ));
+
+        findViewById(R.id.super_sound).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                superSoundTest(superSoundSpinner.getSelectedItemPosition());
+            }
+        });
 
     }
 
     public void clean2Test() {
         mRunningThread =
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    KgeAudioTest.testClean2();
-                } catch (Exception e) {
-                    Log.e(TAG, "clean2Test: ", e);
-                }
-            }
-        }, "AudioTest");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.testClean2();
+                        } catch (Exception e) {
+                            Log.e(TAG, "clean2Test: ", e);
+                        }
+                    }
+                }, "AudioTest");
         mRunningThread.start();
     }
 
@@ -173,31 +194,31 @@ public class MainActivity extends AppCompatActivity {
 
     public void mixTest() {
         mRunningThread =
-         new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    KgeAudioTest.mixTest(false);
-                } catch (Exception e) {
-                    Log.e(TAG, "mixTest: ", e);
-                }
-            }
-        }, "AudioTest");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.mixTest(false);
+                        } catch (Exception e) {
+                            Log.e(TAG, "mixTest: ", e);
+                        }
+                    }
+                }, "AudioTest");
         mRunningThread.start();
     }
 
     public void voiceShiftTest(final int typeId) {
         mRunningThread =
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    KgeAudioTest.voiceShiftTest(typeId);
-                } catch (Exception e) {
-                    Log.e(TAG, "mixTest: ", e);
-                }
-            }
-        }, "VoiceShift");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.voiceShiftTest(typeId);
+                        } catch (Exception e) {
+                            Log.e(TAG, "mixTest: ", e);
+                        }
+                    }
+                }, "VoiceShift");
         mRunningThread.start();
     }
 
@@ -230,18 +251,35 @@ public class MainActivity extends AppCompatActivity {
                 }, "ScaleTest");
         mRunningThread.start();
     }
+
     public void gain() {
         mRunningThread =
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    KgeAudioTest.testGain();
-                } catch (Exception e) {
-                    Log.e(TAG, "mixTest: ", e);
-                }
-            }
-        }, "VoiceShift");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.testGain();
+                        } catch (Exception e) {
+                            Log.e(TAG, "mixTest: ", e);
+                        }
+                    }
+                }, "VoiceShift");
         mRunningThread.start();
     }
+
+    private void superSoundTest(final int selectedItemPosition) {
+        mRunningThread =
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.superSound(selectedItemPosition);
+                        } catch (Exception e) {
+                            Log.e(TAG, "superSound: ", e);
+                        }
+                    }
+                }, "superSound");
+        mRunningThread.start();
+    }
+
 }
