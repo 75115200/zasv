@@ -7,7 +7,7 @@
  * or contact author landerlyoung@gmail.com.
  */
 
-/* C++ header file for class com.young.jnirawbytetest.supersound.SuperSoundWrapper */
+/* C++ header file for class com.tencent.component.media.effect.SuperSoundWrapper */
 #pragma once
 
 #include <jni.h>
@@ -15,7 +15,7 @@
 namespace  SuperSoundWrapper {
 
 //DO NOT modify
-static constexpr auto FULL_CLASS_NAME = "com/young/jnirawbytetest/supersound/SuperSoundWrapper";
+static constexpr auto FULL_CLASS_NAME = "com/tencent/component/media/effect/SuperSoundWrapper";
 
 static constexpr jfloat SUPERSOUND_SURROUND_PARAM_MIN = 0.0;
 static constexpr jfloat SUPERSOUND_SURROUND_PARAM_DEFAUT = 1.3;
@@ -32,7 +32,7 @@ static constexpr jfloat SUPERSOUND_STUDIO_PARAM_MAX = 2.0;
 
 
 /*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
+ * Class:     com_tencent_component_media_effect_SuperSoundWrapper
  * Method:    private static boolean nativeInit()
  * Signature: ()Z
  */
@@ -40,7 +40,7 @@ jboolean nativeInit(JNIEnv *env, jclass clazz);
 
 
 /*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
+ * Class:     com_tencent_component_media_effect_SuperSoundWrapper
  * Method:    private static boolean nativeUninit()
  * Signature: ()Z
  */
@@ -48,7 +48,7 @@ jboolean nativeUninit(JNIEnv *env, jclass clazz);
 
 
 /*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
+ * Class:     com_tencent_component_media_effect_SuperSoundWrapper
  * Method:    private static long nativeCreateIns(int sampleRate, int channelCound)
  * Signature: (II)J
  */
@@ -56,7 +56,7 @@ jlong nativeCreateIns(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCo
 
 
 /*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
+ * Class:     com_tencent_component_media_effect_SuperSoundWrapper
  * Method:    private static boolean nativeSetIntensity(long nativeHandel, int effectType, float intensity)
  * Signature: (JIF)Z
  */
@@ -64,7 +64,7 @@ jboolean nativeSetIntensity(JNIEnv *env, jclass clazz, jlong nativeHandel, jint 
 
 
 /*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
+ * Class:     com_tencent_component_media_effect_SuperSoundWrapper
  * Method:    private static int getLookAhead(long nativeHandel)
  * Signature: (J)I
  */
@@ -72,15 +72,7 @@ jint getLookAhead(JNIEnv *env, jclass clazz, jlong nativeHandel);
 
 
 /*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
- * Method:    private static boolean processF(long nativeHandel, float[] data, int sampleNum)
- * Signature: (J[FI)Z
- */
-jboolean processF(JNIEnv *env, jclass clazz, jlong nativeHandel, jfloatArray data, jint sampleNum);
-
-
-/*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
+ * Class:     com_tencent_component_media_effect_SuperSoundWrapper
  * Method:    private static boolean process(long nativeHandel, byte[] data, int sampleNum)
  * Signature: (J[BI)Z
  */
@@ -88,7 +80,7 @@ jboolean process(JNIEnv *env, jclass clazz, jlong nativeHandel, jbyteArray data,
 
 
 /*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
+ * Class:     com_tencent_component_media_effect_SuperSoundWrapper
  * Method:    private static boolean nativeDestroyIns(long nativeHandel)
  * Signature: (J)Z
  */

@@ -36,19 +36,12 @@ add_library(lib_audio_process SHARED IMPORTED)
 set_target_properties(lib_audio_process PROPERTIES IMPORTED_LOCATION
     ${jniLibs_DIR}/libwebrtc_audio_preprocessing${kge_so_postfix}.so)
 
-add_library(lib_super_sound SHARED IMPORTED)
-set_target_properties(lib_super_sound PROPERTIES IMPORTED_LOCATION
-    ${jniLibs_DIR}/libSuperSound.so)
-
 include_directories(
         ${cpp_DIR}/kge/include
-        ${cpp_DIR}/supersound/include
 )
 
 file(GLOB KALA_SRC
              ${cpp_DIR}/kge/src/*.cpp
-
-             ${cpp_DIR}/supersound/src/*.cpp
 
              ${cpp_DIR}/jni_onload.cpp
 
@@ -66,6 +59,32 @@ target_link_libraries( audio_test
                        log
                        lib_audio_base
                        lib_audio_process
-                       lib_super_sound
+                       )
+
+
+#################### super sound #################
+include_directories(
+        ${cpp_DIR}/supersound/include
+)
+
+file(GLOB SUPER_SOUND_JNI_SRC
+             ${cpp_DIR}/supersound/src/*.cpp
+             )
+
+
+add_library( radio_effect
+
+             SHARED
+
+             ${SUPER_SOUND_JNI_SRC}
+             )
+
+add_library(lib_super_sound_static STATIC IMPORTED)
+set_target_properties(lib_super_sound_static PROPERTIES IMPORTED_LOCATION
+                        ${cpp_DIR}/supersound/lib/armeabi/libSuperSound.a)
+
+target_link_libraries( radio_effect
+                       log
+                       lib_super_sound_static
                        )
 

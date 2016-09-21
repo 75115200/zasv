@@ -1,4 +1,4 @@
-package com.young.jnirawbytetest.supersound;
+package com.tencent.component.media.effect;
 
 import android.support.annotation.NonNull;
 
@@ -48,7 +48,7 @@ public class SuperSoundWrapper {
     private final int mChannelCound;
 
     static {
-        System.loadLibrary("audio_test");
+        System.loadLibrary("radio_effect");
         nativeInit();
     }
 
@@ -93,9 +93,6 @@ public class SuperSoundWrapper {
             long nativeHandel, int effectType, float intensity);
 
     private static native int getLookAhead(long nativeHandel);
-
-    private static native boolean processF(
-            long nativeHandel, float[] data, int sampleNum);
 
     private static native boolean process(
             long nativeHandel, byte[] data, int sampleNum);

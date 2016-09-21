@@ -10,7 +10,7 @@ import com.tencent.audioeffect.effect.KalaVolumeScaler;
 import com.young.jnirawbytetest.IOUtils;
 import com.young.jnirawbytetest.audiotest.logic.PCMAudioPlayer;
 import com.young.jnirawbytetest.audiotest.logic.PCMFormat;
-import com.young.jnirawbytetest.supersound.SuperSoundWrapper;
+import com.tencent.component.media.effect.SuperSoundWrapper;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

@@ -10,7 +10,6 @@ import android.widget.Spinner;
 
 import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
-import com.young.jnirawbytetest.supersound.SuperSoundWrapper;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";

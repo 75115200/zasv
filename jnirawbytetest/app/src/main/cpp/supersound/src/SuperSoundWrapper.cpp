@@ -7,9 +7,12 @@
  * or contact author landerlyoung@gmail.com.
  */
 #include "SuperSoundWrapper.h"
+
+extern "C" {
 #include "supersound_api.h"
 #include "supersound_err.h"
 #include "supersound_types.h"
+}
 
 #ifdef DEBUG
 
@@ -109,17 +112,6 @@ jint getLookAhead(JNIEnv *env, jclass clazz, jlong nativeHandel)
 
 /*
  * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
- * Method:    private static boolean processF(long nativeHandel, float[] data, int sampleNum)
- * Signature: (J[FI)Z
- */
-jboolean processF(JNIEnv *env, jclass clazz, jlong nativeHandel, jfloatArray data, jint sampleNum)
-{
-    return JNI_FALSE;
-}
-
-
-/*
- * Class:     com_young_jnirawbytetest_supersound_SuperSoundWrapper
  * Method:    private static boolean process(long nativeHandel, byte[] data, int sampleNum)
  * Signature: (J[BI)Z
  */
@@ -179,11 +171,6 @@ static const JNINativeMethod gsNativeMethods[] = {
                 /* function pointer */ reinterpret_cast<void *>(getLookAhead)
         },
         {
-                /* method name      */ const_cast<char *>("processF"),
-                /* method signature */ const_cast<char *>("(J[FI)Z"),
-                /* function pointer */ reinterpret_cast<void *>(processF)
-        },
-        {
                 /* method name      */ const_cast<char *>("process"),
                 /* method signature */ const_cast<char *>("(J[BI)Z"),
                 /* function pointer */ reinterpret_cast<void *>(process)
@@ -211,3 +198,19 @@ bool registerNativeFunctions(JNIEnv *env)
 
 } //endof namespace SuperSoundWrapper
 
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
+{
+    JNIEnv *env;
+    if (vm->GetEnv(reinterpret_cast<void **>(&env),
+                   JNI_VERSION_1_6) != JNI_OK) {
+        return -1;
+    }
+    SuperSoundWrapper::registerNativeFunctions(env);
+    return JNI_VERSION_1_6;
+}
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
+{
+
+}

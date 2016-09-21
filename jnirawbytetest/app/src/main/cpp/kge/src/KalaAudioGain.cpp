@@ -1,8 +1,8 @@
 #include "KalaAudioGain.h"
+#include <CautoGain.h>
 
 #ifdef DEBUG
 #include <android/log.h>
-#include <CautoGain.h>
 
 #define LOGV(...)   __android_log_print((int)ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define LOGD(...)   __android_log_print((int)ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)

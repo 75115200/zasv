@@ -5,7 +5,6 @@
 #include "kge/src/KalaAudioGain.h"
 #include "kge/src/KalaReverb.h"
 #include "kge/src/KalaVolumeScaler.h"
-#include "supersound/src/SuperSoundWrapper.h"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -21,7 +20,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     KalaAudioGain::registerNativeFunctions(env);
     KalaReverb::registerNativeFunctions(env);
     KalaVolumeScaler::registerNativeFunctions(env);
-    SuperSoundWrapper::registerNativeFunctions(env);
 
     return JNI_VERSION_1_6;
 }
