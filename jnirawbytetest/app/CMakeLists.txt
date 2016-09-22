@@ -64,11 +64,12 @@ target_link_libraries( audio_test
 
 #################### super sound #################
 include_directories(
-        ${cpp_DIR}/supersound/include
+        ${cpp_DIR}/effect/supersound/include
+        ${cpp_DIR}/effect/voicechanger/include
 )
 
 file(GLOB SUPER_SOUND_JNI_SRC
-             ${cpp_DIR}/supersound/src/*.cpp
+             ${cpp_DIR}/effect/src/*.cpp
              )
 
 
@@ -81,10 +82,15 @@ add_library( radio_effect
 
 add_library(lib_super_sound_static STATIC IMPORTED)
 set_target_properties(lib_super_sound_static PROPERTIES IMPORTED_LOCATION
-                        ${cpp_DIR}/supersound/lib/armeabi/libSuperSound.a)
+                        ${cpp_DIR}/effect/supersound/lib/armeabi/libSuperSound.a)
+
+add_library(lib_vioce_changer_static STATIC IMPORTED)
+set_target_properties(lib_vioce_changer_static PROPERTIES IMPORTED_LOCATION
+                        ${cpp_DIR}/effect/voicechanger/lib/armeabi/libvoicechanger.a)
 
 target_link_libraries( radio_effect
                        log
                        lib_super_sound_static
+                       lib_vioce_changer_static
                        )
 

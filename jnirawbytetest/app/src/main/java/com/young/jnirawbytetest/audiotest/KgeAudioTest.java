@@ -3,10 +3,12 @@ package com.young.jnirawbytetest.audiotest;
 import android.media.AudioFormat;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.service.voice.VoiceInteractionService;
 import android.util.Log;
 
 import com.tencent.audioeffect.effect.KalaReverb;
 import com.tencent.audioeffect.effect.KalaVolumeScaler;
+import com.tencent.component.media.effect.VoiceChangerWrapper;
 import com.young.jnirawbytetest.IOUtils;
 import com.young.jnirawbytetest.audiotest.logic.PCMAudioPlayer;
 import com.young.jnirawbytetest.audiotest.logic.PCMFormat;
@@ -357,6 +359,50 @@ public class KgeAudioTest {
 
         player.release();
         s.release();
+        IOUtils.close(in);
+    }
+
+    public static void voiceSpeed(int channelCount,float scale) throws Exception {
+
+        PCMFormat format = new PCMFormat();
+        format.sampleRate = 44100;
+        format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+        format.outChannelConfig = channelCount == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO;
+        format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
+        PCMAudioPlayer player = new PCMAudioPlayer(format);
+        Bundle param = new Bundle();
+
+        final int sampleSize = channelCount * 2;
+//        final int pcmSize = 2;
+        int bufferSize = format.bufferSize << sampleSize;
+//        bufferSize -= bufferSize % (44100 / 50);
+
+        bufferSize = 882 * 4;
+
+        byte[] inBuffer = new byte[bufferSize];
+
+        InputStream in = new BufferedInputStream(new FileInputStream(
+                channelCount == 1
+                        ? PCM.MONO_MUSIC
+                        : PCM.STEREO_MUSIC
+        ));
+
+        VoiceChangerWrapper vc = new VoiceChangerWrapper();
+
+        vc.setParam(44100, channelCount, scale);
+
+        int readLen;
+        while (!Thread.interrupted() &&
+                (readLen = in.read(inBuffer, 0, bufferSize)) > 0) {
+            byte[] outBuffer = vc.getNiceOutBuffer(readLen);
+            int outSize = vc.process(inBuffer, readLen, outBuffer, outBuffer.length);
+            Log.i(TAG, "voiceSpeed: inSize:" + readLen + " outSize:" + outSize + " scale=" + scale);
+
+            player.write(outBuffer, 0, outSize, param);
+        }
+
+        player.release();
+        vc.release();
         IOUtils.close(in);
     }
 

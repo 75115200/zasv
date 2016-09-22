@@ -158,6 +158,53 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final Spinner voiceSpeedSpinner = (Spinner) findViewById(R.id.voice_speed_spinner);
+
+        voiceSpeedSpinner.setAdapter(new ArrayAdapter<>(
+                MainActivity.this,
+                android.R.layout.simple_list_item_1,
+                new String[] {
+                        "0.5x",
+                        "1.0x",
+                        "1.5x",
+                        "2.0x"
+                }
+        ));
+
+        final Spinner channelSpinner = (Spinner) findViewById(R.id.channel_speed_spinner);
+        channelSpinner.setAdapter(new ArrayAdapter<>(
+                MainActivity.this,
+                android.R.layout.simple_list_item_1,
+                new String[] {
+                        "1", "2"
+                }
+        ));
+
+        findViewById(R.id.voice_speed).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int index = voiceSpeedSpinner.getSelectedItemPosition();
+                int channel = channelSpinner.getSelectedItemPosition() + 1;
+                switch (index) {
+                    case 0:
+                        voiceSpeedTest(channel, 0.5f);
+                        break;
+                    case 1: {
+                        voiceSpeedTest(channel, 1.0f);
+                        break;
+                    }
+                    case 2: {
+                        voiceSpeedTest(channel, 1.5f);
+                        break;
+                    }
+                    case 3: {
+                        voiceSpeedTest(channel, 2f);
+                        break;
+                    }
+                }
+            }
+        });
+
     }
 
     public void clean2Test() {
@@ -281,4 +328,18 @@ public class MainActivity extends AppCompatActivity {
         mRunningThread.start();
     }
 
+    private void voiceSpeedTest(final int channelCount, final float speedScale) {
+        mRunningThread =
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            KgeAudioTest.voiceSpeed(channelCount, speedScale);
+                        } catch (Exception e) {
+                            Log.e(TAG, "superSound: ", e);
+                        }
+                    }
+                }, "superSound");
+        mRunningThread.start();
+    }
 }
