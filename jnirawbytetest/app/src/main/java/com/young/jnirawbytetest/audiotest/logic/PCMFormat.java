@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import java.nio.ByteOrder;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-09
  * Time:   19:38
  * Life with Passion, Code with Creativity.

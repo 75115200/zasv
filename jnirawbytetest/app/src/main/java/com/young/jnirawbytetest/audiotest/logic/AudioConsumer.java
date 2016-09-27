@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import java.nio.ByteBuffer;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-10
  * Time:   15:48
  * Life with Passion, Code with Creativity.

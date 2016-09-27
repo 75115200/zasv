@@ -6,7 +6,7 @@ import io.github.landerlyoung.jenny.NativeProxy;
 
 /**
  * <pre>
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-09-18
  * Time:   11:08
  * Life with Passion, Code with Creativity.

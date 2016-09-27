@@ -9,7 +9,7 @@ import io.github.landerlyoung.jenny.NativeClass;
 import io.github.landerlyoung.jenny.NativeCode;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-04
  * Time:   13:22
  * Life with Passion, Code with Creativity.

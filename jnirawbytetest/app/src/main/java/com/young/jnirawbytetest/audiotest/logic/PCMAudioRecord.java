@@ -10,7 +10,7 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-10
  * Time:   16:35
  * Life with Passion, Code with Creativity.

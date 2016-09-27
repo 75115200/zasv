@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import java.nio.ByteOrder;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-09-02
  * Time:   11:06
  * Life with Passion, Code with Creativity.

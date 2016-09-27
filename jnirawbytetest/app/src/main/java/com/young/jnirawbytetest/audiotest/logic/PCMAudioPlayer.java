@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import java.nio.ByteBuffer;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-09
  * Time:   19:47
  * Life with Passion, Code with Creativity.

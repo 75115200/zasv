@@ -1,6 +1,6 @@
 /**
 * <pre>
-* Author: taylorcyang@tencent.com
+* Author: landerlyoung@gmail.com
 * Date:   2016-09-21
 * Time:   16:59
 * Life with Passion, Code with Creativity.

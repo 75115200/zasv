@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import io.github.landerlyoung.jenny.NativeClass;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-09-13
  * Time:   17:11
  * Life with Passion, Code with Creativity.

@@ -7,7 +7,7 @@ import io.github.landerlyoung.jenny.NativeClass;
 
 /**
  * <pre>
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-09-21
  * Time:   17:00
  * Life with Passion, Code with Creativity.

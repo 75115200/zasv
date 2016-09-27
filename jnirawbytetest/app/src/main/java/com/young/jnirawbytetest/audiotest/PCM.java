@@ -3,7 +3,7 @@ package com.young.jnirawbytetest.audiotest;
 import android.os.Environment;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-25
  * Time:   20:17
  * Life with Passion, Code with Creativity.

@@ -3,7 +3,7 @@ package com.tencent.audioeffect.effect;
 import io.github.landerlyoung.jenny.NativeClass;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-29
  * Time:   16:45
  * Life with Passion, Code with Creativity.

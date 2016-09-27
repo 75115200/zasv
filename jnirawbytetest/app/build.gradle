@@ -65,12 +65,12 @@ android {
     }
 
     //set its value according to CI env
-    def localBuild = true
+    def isCiEnv = false
 
     // filter variants.
     variantFilter { variant ->
         //ignore instant-run variant on CI platform
-        def ignore = !localBuild &&
+        def ignore = isCiEnv &&
                 variant.flavors*.name.contains(INSTANT_RUN_CHANNEL)
 
         variant.setIgnore(ignore)

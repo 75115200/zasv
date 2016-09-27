@@ -4,7 +4,7 @@ package com.young.jnirawbytetest.audiotest;
 import io.github.landerlyoung.jenny.NativeClass;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-23
  * Time:   15:18
  * Life with Passion, Code with Creativity.

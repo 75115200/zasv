@@ -6,7 +6,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * Author: taylorcyang@tencent.com
+ * Author: landerlyoung@gmail.com
  * Date:   2016-08-19
  * Time:   17:09
  * Life with Passion, Code with Creativity.
