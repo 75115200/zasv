@@ -3,7 +3,6 @@ package com.young.jnirawbytetest.audiotest;
 import android.media.AudioFormat;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.service.voice.VoiceInteractionService;
 import android.util.Log;
 
 import com.tencent.audioeffect.effect.KalaReverb;
@@ -369,6 +368,9 @@ public class KgeAudioTest {
         format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         format.outChannelConfig = channelCount == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO;
         format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
+
+        Log.i(TAG, "voiceSpeed: minBufferSize=" + format.bufferSize);
+
         PCMAudioPlayer player = new PCMAudioPlayer(format);
         Bundle param = new Bundle();
 
@@ -389,7 +391,7 @@ public class KgeAudioTest {
 
         VoiceChangerWrapper vc = new VoiceChangerWrapper();
 
-        vc.setParam(44100, channelCount, scale);
+        vc.nativeSetParam(44100, channelCount, scale);
 
         int readLen;
         while (!Thread.interrupted() &&

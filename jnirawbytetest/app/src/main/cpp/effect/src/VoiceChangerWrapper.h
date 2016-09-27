@@ -17,6 +17,7 @@ namespace  VoiceChangerWrapper {
 //DO NOT modify
 static constexpr auto FULL_CLASS_NAME = "com/tencent/component/media/effect/VoiceChangerWrapper";
 
+static constexpr jint OUT_BUFFER_TO_SMALL_MASK = 1 << 31;
 
 
 /*
@@ -29,10 +30,10 @@ jlong nativeCreate(JNIEnv *env, jclass clazz);
 
 /*
  * Class:     com_tencent_component_media_effect_VoiceChangerWrapper
- * Method:    private void setParam(long nativeHandel, int sampleRate, int channel, float tempoDelta, float pitchDelta, int voiceKind, int environment)
+ * Method:    private void nativeSetParam(long nativeHandel, int sampleRate, int channel, float tempoDelta, float pitchDelta, int voiceKind, int environment)
  * Signature: (JIIFFII)V
  */
-void setParam(JNIEnv *env, jobject thiz, jlong nativeHandel, jint sampleRate, jint channel, jfloat tempoDelta, jfloat pitchDelta, jint voiceKind, jint environment);
+void nativeSetParam(JNIEnv *env, jobject thiz, jlong nativeHandel, jint sampleRate, jint channel, jfloat tempoDelta, jfloat pitchDelta, jint voiceKind, jint environment);
 
 
 /*
@@ -40,7 +41,7 @@ void setParam(JNIEnv *env, jobject thiz, jlong nativeHandel, jint sampleRate, ji
  * Method:    private int nativeProcess(long nativeHandel, byte[] inData, int inDatasize, byte[] outData, int outDatasize)
  * Signature: (J[BI[BI)I
  */
-jint nativeProcess(JNIEnv *env, jobject thiz, jlong nativeHandel, jbyteArray inData, jint inDataSize, jbyteArray outData, jint outDatasize);
+jint nativeProcess(JNIEnv *env, jobject thiz, jlong nativeHandel, jbyteArray inData, jint inDatasize, jbyteArray outData, jint outDatasize);
 
 
 /*

@@ -7,26 +7,24 @@
  * or contact author landerlyoung@gmail.com.
  */
 #include <algorithm>
+#include <android/log.h>
 #include "VoiceChangerWrapper.h"
 
 #include "libvoicechanger.h"
 
 
+
+#define LOGW(...)   __android_log_print((int)ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+#define LOGE(...)   __android_log_print((int)ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
 #ifdef DEBUG
-
-#include <android/log.h>
-
 #define LOGV(...)   __android_log_print((int)ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define LOGD(...)   __android_log_print((int)ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 #define LOGI(...)   __android_log_print((int)ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGW(...)   __android_log_print((int)ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
-#define LOGE(...)   __android_log_print((int)ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #else
 #define LOGV(...)
 #define LOGD(...)
 #define LOGI(...)
-#define LOGW(...)
-#define LOGE(...)
 #endif
 
 
@@ -74,7 +72,7 @@ jlong nativeCreate(JNIEnv *env, jclass clazz)
 
 /*
  * Class:     com_tencent_component_media_effect_VoiceChangerWrapper
- * Method:    private void setParam(long nativeHandel, int sampleRate, int channel, float tempoDelta, float pitchDelta, int voiceKind, int environment)
+ * Method:    private void nativeSetParam(long nativeHandel, int sampleRate, int channel, float tempoDelta, float pitchDelta, int voiceKind, int environment)
  * Signature: (JIIFFII)V
  */
 void setParam(JNIEnv *env, jobject thiz, jlong nativeHandel, jint sampleRate, jint channel,
@@ -125,29 +123,49 @@ jint nativeProcess(JNIEnv *env, jobject thiz, jlong nativeHandel,
     //chunk is 20ms pcmData PCM16le
     const jint chunkSizeInShort = cxt->sampleRate * cxt->channelCount / 50;
 
+    bool outBufferTooSmall = false;
+
     while (inShortIndex < inDataShortLen && outShortIndex < outDataShortLen) {
         const jint chunkSize = std::min(chunkSizeInShort, inDataShortLen - inShortIndex);
 
-        jint outDataLen = outDataShortLen - outShortIndex;
+        jint outDataLeft = outDataShortLen - outShortIndex;
+
+        jint processDataLen = 0;
 
         libVoiceChangerRun_API(
                 vcIns,
                 inDataShorts + inShortIndex, chunkSize,
-                outDataShorts + outShortIndex, &outDataLen);
+                outDataShorts + outShortIndex, &processDataLen);
 
-        LOGV("%s chunkSize %d outSize %d", __FUNCTION__, chunkSize, outDataLen);
+        if (processDataLen > outDataLeft) {
+            //OMG! What a narrow escape!
+            //We provided a buffer that is not long enough!
+            //And we successfully escaped from a SIGSEGV crash!
+            //Enlarge the out buffer right NOW! NOW! NOW!
+            outBufferTooSmall = true;
+            LOGE("%s outBufferTooSmall! processDataLen:%d > outDataLen:%d",
+                 __FUNCTION__, processDataLen, outDataLeft);
+            break;
+        }
+
+        LOGV("%s chunkSize %d outSize %d", __FUNCTION__, chunkSize, processDataLen);
         inShortIndex += chunkSize;
-        outShortIndex += outDataLen;
+        outShortIndex += processDataLen;
     }
 
     env->ReleaseByteArrayElements(inData, inDataBytes, JNI_ABORT);
     env->ReleaseByteArrayElements(outData, outDataBytes, 0);
 
-
     LOGI("%s inSize:%d outArrayLen:%d outSize:%d",
          __FUNCTION__, inDataSize, outDataSize, outShortIndex * 2);
 
-    return outShortIndex * 2;
+    jint dataLenInBytesMasked = outShortIndex * 2;
+
+    if (outBufferTooSmall) {
+        dataLenInBytesMasked |= OUT_BUFFER_TO_SMALL_MASK;
+    }
+
+    return dataLenInBytesMasked;
 }
 
 
@@ -170,7 +188,7 @@ static const JNINativeMethod gsNativeMethods[] = {
                 /* function pointer */ reinterpret_cast<void *>(nativeCreate)
         },
         {
-                /* method name      */ const_cast<char *>("setParam"),
+                /* method name      */ const_cast<char *>("nativeSetParam"),
                 /* method signature */ const_cast<char *>("(JIIFFII)V"),
                 /* function pointer */ reinterpret_cast<void *>(setParam)
         },

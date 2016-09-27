@@ -17,6 +17,7 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
+final String INSTANT_RUN_CHANNEL = 'INSTRUN_T'
 android {
     compileSdkVersion 23
     buildToolsVersion "24.0.0"
@@ -51,6 +52,47 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+        }
+    }
+
+    productFlavors {
+        //instant-run flavor
+        "$INSTANT_RUN_CHANNEL" {
+            minSdkVersion 21
+            targetSdkVersion 22
+            multiDexEnabled false
+        }
+    }
+
+    //set its value according to CI env
+    def localBuild = true
+
+    // filter variants.
+    variantFilter { variant ->
+        //ignore instant-run variant on CI platform
+        def ignore = !localBuild &&
+                variant.flavors*.name.contains(INSTANT_RUN_CHANNEL)
+
+        variant.setIgnore(ignore)
+    }
+
+    applicationVariants.all { variant ->
+        //Removing multi process settings in manifest, to enable instant-run.
+        if (variant.name.startsWith(INSTANT_RUN_CHANNEL)) {
+            variant.outputs.each { output ->
+                output.processManifest.doLast {
+                    [output.processManifest.instantRunManifestOutputFile,
+                     output.processManifest.manifestOutputFile,
+                     output.processManifest.aaptFriendlyManifestOutputFile
+                    ].grep { it?.exists() }.each { manifestFile ->
+                        def oldFileContents = manifestFile.getText('UTF-8')
+                        def newFileContents = oldFileContents.replaceAll('android:process=\".*\"', '')
+                        manifestFile.write(newFileContents, 'UTF-8')
+
+                        println "remove all android:process attr for ${manifestFile.absolutePath}"
+                    }
+                }
+            }
         }
     }
 }
