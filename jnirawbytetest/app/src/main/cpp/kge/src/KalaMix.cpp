@@ -100,6 +100,9 @@ jlong create(JNIEnv *env, jclass clazz,
              jint bgmChannelCount,
              jint vocalChannelCount)
 {
+    LOGV("%s sampleRate:%d, bgmChannelCount:%d, vocalChannelCount:%d",
+         __FUNCTION__, sampleRate, bgmChannelCount, vocalChannelCount);
+
     MixContext *ins = new MixContext(sampleRate, bgmChannelCount, vocalChannelCount);
     return reinterpret_cast<jlong>(ins);
 }

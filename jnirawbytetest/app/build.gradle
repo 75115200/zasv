@@ -17,7 +17,7 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
-final String INSTANT_RUN_CHANNEL = 'INSTRUN_T'
+final String INSTANT_RUN_FALVOR = 'instantRun'
 android {
     compileSdkVersion 23
     buildToolsVersion "24.0.0"
@@ -35,6 +35,8 @@ android {
                 abiFilters 'armeabi', 'armeabi-v7a'
             }
         }
+
+        multiDexEnabled = true
 
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a'
@@ -56,11 +58,14 @@ android {
     }
 
     productFlavors {
+        pruduct {
+            //default publish flavor
+        }
+
         //instant-run flavor
-        "$INSTANT_RUN_CHANNEL" {
+        "$INSTANT_RUN_FALVOR" {
             minSdkVersion 21
             targetSdkVersion 22
-            multiDexEnabled false
         }
     }
 
@@ -71,14 +76,14 @@ android {
     variantFilter { variant ->
         //ignore instant-run variant on CI platform
         def ignore = isCiEnv &&
-                variant.flavors*.name.contains(INSTANT_RUN_CHANNEL)
+                variant.flavors*.name.contains(INSTANT_RUN_FALVOR)
 
         variant.setIgnore(ignore)
     }
 
     applicationVariants.all { variant ->
         //Removing multi process settings in manifest, to enable instant-run.
-        if (variant.name.startsWith(INSTANT_RUN_CHANNEL)) {
+        if (variant.name.startsWith(INSTANT_RUN_FALVOR)) {
             variant.outputs.each { output ->
                 output.processManifest.doLast {
                     [output.processManifest.instantRunManifestOutputFile,

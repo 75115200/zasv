@@ -64,11 +64,27 @@ public class KgeAudioTest {
     }
 
     public static void mixTest(boolean stereo) throws Exception {
-        stereo = true;
+
+        //ok
+        //final boolean bgmStereo = true;
+        //final boolean vocalStereo = true;
+
+        //ok
+        //final boolean bgmStereo = true;
+        //final boolean vocalStereo = false;
+
+        //ok
+        //final boolean bgmStereo = false;
+        //final boolean vocalStereo = true;
+
+        //no
+        final boolean bgmStereo = false;
+        final boolean vocalStereo = false;
+
         PCMFormat format = new PCMFormat();
         format.sampleRate = 44100;
         format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-        if (stereo) {
+        if (bgmStereo || vocalStereo) {
             format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
         } else {
             format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
@@ -81,32 +97,32 @@ public class KgeAudioTest {
         final int stereoBufferSize = monoBufferSize << 1;
 
         final byte[] bgmBuffer = new byte[stereoBufferSize];
-        final byte[] vocalBuffer = new byte[monoBufferSize];
+        final byte[] vocalBuffer = new byte[stereoBufferSize];
         final byte[] outBuffer = new byte[stereoBufferSize];
 
         InputStream bgmIn = new BufferedInputStream(new FileInputStream(
-                stereo ? PCM.STEREO_MUSIC : PCM.MONO_MUSIC));
+                bgmStereo ? PCM.STEREO_MUSIC : PCM.MONO_MUSIC));
 
-        stereo = false;
         InputStream vocalIn = new BufferedInputStream(new FileInputStream(
-                stereo ? PCM.STEREO : PCM.MONO));
+                vocalStereo ? PCM.STEREO : PCM.MONO));
 
         final KalaMix mix = new KalaMix(
-                format.sampleRate, 2,1
-//                stereo ? 2 : 1,
-//                stereo ? 2 : 1
+                format.sampleRate,
+                bgmStereo ? 2 : 1,
+                vocalStereo ? 2 : 1
         );
 
         int bgmRead;
         int vocalRead;
         while (!Thread.interrupted() &&
-                (bgmRead = bgmIn.read(bgmBuffer, 0, stereoBufferSize)) > 0
-                && (vocalRead = vocalIn.read(vocalBuffer, 0, monoBufferSize)) > 0) {
-            mix.process(bgmBuffer, stereoBufferSize,
-                        vocalBuffer, monoBufferSize,
-                        outBuffer, stereoBufferSize);
+                (bgmRead = bgmIn.read(bgmBuffer, 0, bgmStereo ? stereoBufferSize : monoBufferSize)) > 0
+                && (vocalRead = vocalIn.read(vocalBuffer, 0, vocalStereo ? stereoBufferSize : monoBufferSize)) > 0) {
+            mix.process(bgmBuffer, bgmRead,
+                        vocalBuffer, vocalRead,
+                        outBuffer, bgmStereo || vocalStereo ? stereoBufferSize : monoBufferSize);
 
-            player.write(outBuffer, 0, stereoBufferSize, param);
+            player.write(outBuffer, 0, bgmStereo || vocalStereo ? stereoBufferSize : monoBufferSize,
+                         param);
         }
 
         player.release();
@@ -384,9 +400,8 @@ public class KgeAudioTest {
         byte[] inBuffer = new byte[bufferSize];
 
         InputStream in = new BufferedInputStream(new FileInputStream(
-                channelCount == 1
-                        ? PCM.MONO_MUSIC
-                        : PCM.STEREO_MUSIC
+                channelCount == 1 ? PCM.MONO_MUSIC : PCM.STEREO_MUSIC
+//                channelCount == 1 ? PCM.MONO : PCM.STEREO
         ));
 
         VoiceChangerWrapper vc = new VoiceChangerWrapper();
