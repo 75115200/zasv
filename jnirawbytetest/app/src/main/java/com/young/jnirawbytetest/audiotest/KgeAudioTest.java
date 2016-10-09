@@ -84,11 +84,7 @@ public class KgeAudioTest {
         PCMFormat format = new PCMFormat();
         format.sampleRate = 44100;
         format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
-        if (bgmStereo || vocalStereo) {
-            format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
-        } else {
-            format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
-        }
+        format.outChannelConfig = AudioFormat.CHANNEL_OUT_STEREO;
         format.bufferSize = PCMAudioPlayer.getMinBuffeSize(format);
         PCMAudioPlayer player = new PCMAudioPlayer(format);
         Bundle param = new Bundle();
@@ -119,10 +115,9 @@ public class KgeAudioTest {
                 && (vocalRead = vocalIn.read(vocalBuffer, 0, vocalStereo ? stereoBufferSize : monoBufferSize)) > 0) {
             mix.process(bgmBuffer, bgmRead,
                         vocalBuffer, vocalRead,
-                        outBuffer, bgmStereo || vocalStereo ? stereoBufferSize : monoBufferSize);
+                        outBuffer, stereoBufferSize);
 
-            player.write(outBuffer, 0, bgmStereo || vocalStereo ? stereoBufferSize : monoBufferSize,
-                         param);
+            player.write(outBuffer, 0, stereoBufferSize, param);
         }
 
         player.release();
