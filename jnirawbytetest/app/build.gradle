@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.1'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -28,6 +28,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
 
         externalNativeBuild {
             cmake {
@@ -36,10 +37,10 @@ android {
             }
         }
 
-        multiDexEnabled = true
-
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a'
+            jobs 8
+            stl 'stlport_static'
         }
     }
 
