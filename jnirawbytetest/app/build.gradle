@@ -7,15 +7,12 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.1'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 final String INSTANT_RUN_FALVOR = 'instantRun'
 android {
@@ -105,7 +102,7 @@ android {
 
 dependencies {
     provided 'io.github.landerlyoung:jenny-annotation:0.1.0'
-    apt 'io.github.landerlyoung:jenny-compiler:0.1.0'
+    annotationProcessor 'io.github.landerlyoung:jenny-compiler:0.1.0'
 
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
