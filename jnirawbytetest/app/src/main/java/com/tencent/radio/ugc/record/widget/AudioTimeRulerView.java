@@ -8,7 +8,6 @@ import android.graphics.Path;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +18,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Locale;
+
+import static android.R.attr.duration;
 
 /**
  * <pre>
@@ -35,6 +36,8 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     private final Paint mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path mRulerPath = new Path();
     private final Path mPointerPath = new Path();
+
+    private static final long PATH_TIME_DURATION_MILLIS = 1000;
 
     /** how tall the ruler is **/
     private float mRulerHeight;
@@ -292,34 +295,25 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         }
 
         final long startTimeMillis = getCurrentStartTime() * 1000;
-        final long pathTimeDuration = 1000;
         final int pathSegmentCountToDisplay =
                 (int) Math.ceil((getWidth() + getCurrentScrollOffset()) / mRulerSecondWidth);
         final long endTimeMillis =
-                Math.min(startTimeMillis + pathTimeDuration * pathSegmentCountToDisplay,
+                Math.min(startTimeMillis + PATH_TIME_DURATION_MILLIS * pathSegmentCountToDisplay,
                         mRulerAdapter.getTotalTime());
-        final long lastSegmentStartTime = endTimeMillis - (1 + (endTimeMillis - 1) % pathTimeDuration);
+        final long lastSegmentStartTime = endTimeMillis - (1 + (endTimeMillis - 1) % PATH_TIME_DURATION_MILLIS);
 
         if (getLivePathSegmentsStartTime() == startTimeMillis &&
                 getLivePathSegmentsEndTime() == endTimeMillis) {
             // the same
             return;
         }
-        //// STOPSHIP: 04/11/2016
-        //// TODO: 04/11/2016
-        recycleAllPathSegment();
-        addPathSegment(startTimeMillis, endTimeMillis, pathTimeDuration, true);
-//
-//        if (mLivePathSegments.isEmpty()) {
-//            addPathSegment(startTimeMillis, endTimeMillis, pathTimeDuration, true);
-//        } else {
-//            PathSegment lastSegment = mLivePathSegments.getLast();
-//            if (lastSegment.startTime + lastSegment.duration != endTimeMillis) {
-//                // remove partial built segment
-//                mLivePathSegments.removeLast();
-//            }
-//            addPathSegmentIncrementally(startTimeMillis, pathTimeDuration, endTimeMillis, lastSegmentStartTime);
-//        }
+
+        if (mLivePathSegments.isEmpty()) {
+            addPathSegment(startTimeMillis, endTimeMillis, PATH_TIME_DURATION_MILLIS, true);
+        } else {
+            addPathSegmentIncrementally(startTimeMillis, PATH_TIME_DURATION_MILLIS, endTimeMillis,
+                    lastSegmentStartTime);
+        }
     }
 
     private void addPathSegmentIncrementally(
@@ -328,52 +322,66 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
             long endTimeMillis,
             long lastSegmentStartTime) {
 
-        // full rebuild
-        if (mLivePathSegments.isEmpty()) {
-            addPathSegment(startTimeMillis, endTimeMillis, pathTimeDuration, true);
-            return;
-        }
-
-        // try to remove old item and add new ones
-        final long firstPathSegmentTime = mLivePathSegments.getFirst().startTime;
-        final long lastPathSegmentTime = mLivePathSegments.getLast().startTime;
-
-        if (endTimeMillis < firstPathSegmentTime || startTimeMillis > lastPathSegmentTime) {
-            // can't reuse any pathSegment
-            // full rebuild
-            recycleAllPathSegment();
-            addPathSegment(startTimeMillis, endTimeMillis, pathTimeDuration, true);
-            return;
-
-        }
-
-        if (startTimeMillis > firstPathSegmentTime) {
-            // remove header old items
-//            while (!mLivePathSegments.isEmpty()) {
-            while (true) {
-                PathSegment first = mLivePathSegments.getFirst();
-                if (first.startTime < startTimeMillis) {
-                    recyclePathSegment(mLivePathSegments.removeFirst());
-                } else {
-                    break;
-                }
+        // remove too early items
+        ListIterator<PathSegment> it = mLivePathSegments.listIterator();
+        while (it.hasNext()) {
+            PathSegment tmp = it.next();
+            if (tmp.startTime < startTimeMillis) {
+                recyclePathSegment(tmp);
+                it.remove();
+            } else {
+                break;
             }
         }
 
-        if (lastSegmentStartTime < getLivePathSegmentsEndTime()){
-            // remove tail old items
-//            while (!mLivePathSegments.isEmpty()) {
-            while (true) {
-                PathSegment last = mLivePathSegments.getLast();
-                if (last.startTime < lastSegmentStartTime) {
-                    recyclePathSegment(mLivePathSegments.removeLast());
-                } else {
-                    break;
-                }
+        // remove too late items
+        it = mLivePathSegments.listIterator(mLivePathSegments.size());
+        while (it.hasPrevious()) {
+            PathSegment tmp = it.previous();
+            if (tmp.startTime > lastSegmentStartTime) {
+                recyclePathSegment(tmp);
+                it.remove();
+            } else {
+                break;
             }
         }
 
+        // add or update items
+        it = mLivePathSegments.listIterator();
+        while (startTimeMillis < endTimeMillis) {
+            if (it.hasNext()) {
+                PathSegment tmp = it.next();
+                if (startTimeMillis < tmp.startTime) {
+                    // insert item at front
+                    PathSegment newOne = obtainPathSegment();
+                    long duration = Math.min(endTimeMillis - startTimeMillis, pathTimeDuration);
+                    newOne.constructPath(startTimeMillis, duration);
+                    startTimeMillis += duration;
 
+                    it.previous();
+                    it.add(newOne);
+                } else if (!tmp.partialBuild) {
+                    // meet the reusable part, skip it
+                    // update time
+                    startTimeMillis = tmp.getEndTime();
+                } else {
+                    // the last one is partial build
+                    // update it
+                    long duration = Math.min(endTimeMillis - startTimeMillis, pathTimeDuration);
+                    tmp.constructPath(startTimeMillis, duration);
+
+                    startTimeMillis += duration;
+                }
+            } else {
+                // reached end, just add new items
+                PathSegment tmp = obtainPathSegment();
+                long duration = Math.min(endTimeMillis - startTimeMillis, pathTimeDuration);
+                tmp.constructPath(startTimeMillis, duration);
+                startTimeMillis += duration;
+
+                it.add(tmp);
+            }
+        }
     }
 
     private long getLivePathSegmentsStartTime() {
@@ -464,6 +472,11 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         public long startTime;
         public long duration;
         public float totalHeight;
+        public boolean partialBuild;
+
+        public long getEndTime() {
+            return startTime + duration;
+        }
 
         public void constructPath(long startTime, long duration) {
             totalHeight = (int) ((getHeight() - mRulerHeight) / 2);
@@ -480,6 +493,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
                 addWaveToPath(this.duration, startTime - this.duration, duration - this.duration);
                 this.duration = duration;
             }
+            partialBuild = duration < PATH_TIME_DURATION_MILLIS;
         }
 
         /**
