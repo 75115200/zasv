@@ -11,7 +11,9 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.OverScroller;
+import android.widget.Scroller;
 
 import java.util.Formatter;
 import java.util.Iterator;
@@ -65,6 +67,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     //state
     private float mPointerPositionX;
+    private boolean mTouchable = true;
 
     //text display
     private StringBuilder mCachedTimeTextStingBuilder = new StringBuilder();
@@ -72,7 +75,8 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     // Motion
     private final GestureDetector mGestureDetector;
-    private final OverScroller mScroller;
+    private final OverScroller mGestureScroller;
+    private final Scroller mAutoScroller;
 
     private float mWaveScrollX;
     private int mScrollXInitialOffset;
@@ -96,7 +100,8 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         super(context, attrs, defStyleAttr);
 
         mGestureDetector = new GestureDetector(context, this);
-        mScroller = new OverScroller(context);
+        mGestureScroller = new OverScroller(context);
+        mAutoScroller = new Scroller(context, new LinearInterpolator());
 
         initFakeData();
     }
@@ -291,6 +296,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     private void updateWavePath() {
         if (mRulerAdapter == null) {
             recycleAllPathSegment();
+            invalidate();
             return;
         }
 
@@ -314,6 +320,8 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
             addPathSegmentIncrementally(startTimeMillis, PATH_TIME_DURATION_MILLIS, endTimeMillis,
                     lastSegmentStartTime);
         }
+
+        invalidate();
     }
 
     private void addPathSegmentIncrementally(
@@ -454,7 +462,22 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     }
 
     public void notifyDataAdded(long startTime, long duration) {
+        updateWavePath();
 
+        final float posBeforeChange = timeToScrollOffset(startTime);
+
+        // view is in the old position or fling to the old position
+        // scroll to new position automatically
+        if (Math.abs(posBeforeChange - mWaveScrollX) < mRulerSecondWidth / mWaveScalePrecision
+                || (!mGestureScroller.isFinished())
+                && mGestureScroller.getStartX() < mGestureScroller.getFinalX()
+                && mGestureScroller.getFinalX() + mRulerSecondWidth > posBeforeChange) {
+            scrollToRight(true);
+        }
+    }
+
+    private float timeToScrollOffset(long timeMillis) {
+        return timeMillis * mRulerSecondWidth / 1000 + mScrollXInitialOffset;
     }
 
     public interface RulerAdapter {
@@ -549,17 +572,41 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     }
 
     private float getMaxScroll() {
-        float dataLengthInPixel = 0;
         if (mRulerAdapter != null) {
-            dataLengthInPixel = mRulerAdapter.getTotalTime() * mRulerSecondWidth / 1000;
+            return timeToScrollOffset(mRulerAdapter.getTotalTime());
         }
-        return dataLengthInPixel + mScrollXInitialOffset;
+        return 0;
+    }
+
+    public void scrollToLeft(boolean doAnimation) {
+        mGestureScroller.forceFinished(true);
+        if (doAnimation) {
+            mGestureScroller.startScroll((int) mWaveScrollX, 0, mScrollXInitialOffset, 0);
+        } else {
+            mWaveScrollX = mScrollXInitialOffset;
+        }
+        invalidate();
+    }
+
+    public void scrollToRight(boolean doAnimation) {
+        mGestureScroller.forceFinished(true);
+        if (doAnimation) {
+            mGestureScroller.startScroll((int) mWaveScrollX, 0, (int) (getMaxScroll() - mWaveScrollX), 0);
+        } else {
+            mWaveScrollX = getMaxScroll();
+        }
+        invalidate();
     }
 
     private void adjustPosition(boolean forceAdjust, boolean doAnimation) {
-        if (!mScroller.isFinished()) {
-            // do nothing when scrolling
-            return;
+        if (!mGestureScroller.isFinished()) {
+            if (forceAdjust) {
+                // abort current scrolling
+                mGestureScroller.abortAnimation();
+            } else {
+                // do nothing when scrolling
+                return;
+            }
         }
 
         boolean needAdjust = forceAdjust;
@@ -576,7 +623,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
         if (needAdjust) {
             if (doAnimation) {
-                mScroller.startScroll(
+                mGestureScroller.startScroll(
                         (int) mWaveScrollX, 0,
                         (int) (targetScroll - mWaveScrollX), 0);
             } else {
@@ -589,26 +636,30 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     // Mark: Gesture and scroll
     @Override
     public void scrollTo(int x, int y) {
-        mScroller.startScroll((int) mWaveScrollX, 0, x, 0);
+        mGestureScroller.startScroll((int) mWaveScrollX, 0, x, 0);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        boolean consumed = mGestureDetector.onTouchEvent(event);
-        if (event.getActionMasked() == MotionEvent.ACTION_UP
-                || event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
-            adjustPosition(false, true);
-            return true;
+        if (mTouchable) {
+            boolean consumed = mGestureDetector.onTouchEvent(event);
+            if (event.getActionMasked() == MotionEvent.ACTION_UP
+                    || event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
+                adjustPosition(false, true);
+                return true;
+            }
+            return consumed;
+        } else {
+            return false;
         }
-        return consumed;
     }
 
     @Override
     public void computeScroll() {
         super.computeScroll();
 
-        if (mScroller.computeScrollOffset()) {
-            mWaveScrollX = mScroller.getCurrX();
+        if (mGestureScroller.computeScrollOffset()) {
+            mWaveScrollX = mGestureScroller.getCurrX();
             invalidate();
         }
     }
@@ -616,7 +667,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         // stop previous anime
-        mScroller.abortAnimation();
+        mGestureScroller.abortAnimation();
 
         mWaveScrollX += distanceX;
 
@@ -627,9 +678,9 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         // stop previous anime
-        mScroller.abortAnimation();
+        mGestureScroller.abortAnimation();
 
-        mScroller.fling(
+        mGestureScroller.fling(
                 (int) mWaveScrollX, 0,
                 (int) -velocityX, 0,
                 //min/max X
@@ -643,7 +694,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     @Override
     public boolean onDown(MotionEvent e) {
-        mScroller.abortAnimation();
+        mGestureScroller.abortAnimation();
         return true;
     }
 
@@ -654,9 +705,9 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        if (mScroller.isFinished()) {
+        if (mGestureScroller.isFinished()) {
             if (mWaveScrollX < mScrollXInitialOffset) {
-                mScroller.startScroll(
+                mGestureScroller.startScroll(
                         (int) mWaveScrollX, 0,
                         (int) (mScrollXInitialOffset - mWaveScrollX), 0);
             } else {
@@ -665,7 +716,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
                     maxScrollX = mRulerAdapter.getTotalTime() * mRulerSecondWidth / 1000;
                 }
                 if (mWaveScrollX > maxScrollX) {
-                    mScroller.startScroll((int) maxScrollX, 0,
+                    mGestureScroller.startScroll((int) maxScrollX, 0,
                             (int) (maxScrollX - mWaveScrollX), 0);
                 }
             }

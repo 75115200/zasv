@@ -1,6 +1,7 @@
 package com.young.jnirawbytetest;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -9,22 +10,24 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
-import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
+import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     Thread mRunningThread;
 
+    Handler h = new Handler();
+    long totalTime = 0;
+
     private void initRuler() {
-        AudioTimeRulerView rulerView = (AudioTimeRulerView) findViewById(R.id.time_ruler);
+        final AudioTimeRulerView rulerView = (AudioTimeRulerView) findViewById(R.id.time_ruler);
         rulerView.setRulerAdapter(new AudioTimeRulerView.RulerAdapter() {
             @Override
             public long getTotalTime() {
-                return 4500;
+                return totalTime;
             }
 
             @Override
@@ -32,7 +35,18 @@ public class MainActivity extends AppCompatActivity {
                 if (timeMillis < 0) {
                     return 2;
                 }
-                return (int) (Math.abs(Math.sin(timeMillis * Math.PI * 2 / 4000)) * 90);
+                int count = (int) (timeMillis / 50);
+                return (int) ((count % 40) * (100f / 40));
+            }
+        });
+
+        h.post(new Runnable() {
+            @Override
+            public void run() {
+                totalTime += 50;
+                rulerView.notifyDataAdded(totalTime - 50, 50);
+
+                h.postDelayed(this, 50);
             }
         });
 
