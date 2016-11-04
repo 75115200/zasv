@@ -3,6 +3,7 @@ package com.young.jnirawbytetest;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -25,6 +26,14 @@ public class MainActivity extends AppCompatActivity {
     private void initRuler() {
         final AudioTimeRulerView rulerView = (AudioTimeRulerView) findViewById(R.id.time_ruler);
         rulerView.setRulerAdapter(new AudioTimeRulerView.RulerAdapter() {
+            @Override
+            public CharSequence getTimeString(long timeSecond) {
+                if (timeSecond < 0) {
+                    return null;
+                }
+                return DateFormat.format("mm:ss", timeSecond * 1000);
+            }
+
             @Override
             public long getTotalTime() {
                 return totalTime;

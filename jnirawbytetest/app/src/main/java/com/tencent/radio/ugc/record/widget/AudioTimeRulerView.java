@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -69,10 +70,6 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     private float mPointerPositionX;
     private boolean mTouchable = true;
 
-    //text display
-    private StringBuilder mCachedTimeTextStingBuilder = new StringBuilder();
-    private Formatter mCachedTimeTextFormatter = new Formatter(mCachedTimeTextStingBuilder, Locale.US);
-
     // Motion
     private final GestureDetector mGestureDetector;
     private final OverScroller mGestureScroller;
@@ -83,6 +80,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     // MARK: data
     private RulerAdapter mRulerAdapter;
+    private LayoutStrategy mLayoutStrategy;
 
     // MARK: path
     private LinkedList<PathSegment> mLivePathSegments = new LinkedList<>();
@@ -114,6 +112,142 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         mRulerAdapter = rulerAdapter;
 
         notifyDataSetChanged();
+    }
+
+    public float getRulerHeight() {
+        return mRulerHeight;
+    }
+
+    public LayoutStrategy getLayoutStrategy() {
+        return mLayoutStrategy;
+    }
+
+    public void setLayoutStrategy(LayoutStrategy layoutStrategy) {
+        mLayoutStrategy = layoutStrategy;
+    }
+
+    public void setRulerHeight(float rulerHeight) {
+        mRulerHeight = rulerHeight;
+    }
+
+    public float getRulerSecondaryHeight() {
+        return mRulerSecondaryHeight;
+    }
+
+    public void setRulerSecondaryHeight(float rulerSecondaryHeight) {
+        mRulerSecondaryHeight = rulerSecondaryHeight;
+    }
+
+    public float getRulerSecondWidth() {
+        return mRulerSecondWidth;
+    }
+
+    public void setRulerSecondWidth(float rulerSecondWidth) {
+        mRulerSecondWidth = rulerSecondWidth;
+    }
+
+    public int getRulerPrecision() {
+        return mRulerPrecision;
+    }
+
+    public void setRulerPrecision(int rulerPrecision) {
+        mRulerPrecision = rulerPrecision;
+    }
+
+    public float getRulerTextPadding() {
+        return mRulerTextPadding;
+    }
+
+    public void setRulerTextPadding(float rulerTextPadding) {
+        mRulerTextPadding = rulerTextPadding;
+    }
+
+    public int getWaveScalePrecision() {
+        return mWaveScalePrecision;
+    }
+
+    public void setWaveScalePrecision(int waveScalePrecision) {
+        mWaveScalePrecision = waveScalePrecision;
+    }
+
+    public float getWaveStrokeWidth() {
+        return mWaveStrokeWidth;
+    }
+
+    public void setWaveStrokeWidth(float waveStrokeWidth) {
+        mWaveStrokeWidth = waveStrokeWidth;
+    }
+
+    public float getRulerStrokeWidth() {
+        return mRulerStrokeWidth;
+    }
+
+    public void setRulerStrokeWidth(float rulerStrokeWidth) {
+        mRulerStrokeWidth = rulerStrokeWidth;
+    }
+
+    public float getPointerStrokeWidth() {
+        return mPointerStrokeWidth;
+    }
+
+    public void setPointerStrokeWidth(float pointerStrokeWidth) {
+        mPointerStrokeWidth = pointerStrokeWidth;
+    }
+
+    public float getPointerTriangleWidth() {
+        return mPointerTriangleWidth;
+    }
+
+    public void setPointerTriangleWidth(float pointerTriangleWidth) {
+        mPointerTriangleWidth = pointerTriangleWidth;
+    }
+
+    public int getRulerColor() {
+        return mRulerColor;
+    }
+
+    public void setRulerColor(int rulerColor) {
+        mRulerColor = rulerColor;
+    }
+
+    public int getPointerColor() {
+        return mPointerColor;
+    }
+
+    public void setPointerColor(int pointerColor) {
+        mPointerColor = pointerColor;
+    }
+
+    public int getWaveColor() {
+        return mWaveColor;
+    }
+
+    public void setWaveColor(int waveColor) {
+        mWaveColor = waveColor;
+    }
+
+    public float getPointerPositionX() {
+        return mPointerPositionX;
+    }
+
+    public void setPointerPositionX(float pointerPositionX) {
+        mPointerPositionX = pointerPositionX;
+    }
+
+    public boolean isTouchable() {
+        return mTouchable;
+    }
+
+    public void setTouchable(boolean touchable) {
+        mTouchable = touchable;
+    }
+
+    public int getScrollXInitialOffset() {
+        return mScrollXInitialOffset;
+    }
+
+    public void setScrollXInitialOffset(int scrollXInitialOffset) {
+        mScrollXInitialOffset = scrollXInitialOffset;
     }
 
     private void initFakeData() {
@@ -168,8 +302,8 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         final float textY = mRulerHeight - mRulerSecondaryHeight - mRulerTextPadding;
 
         while (textX < getWidth()) {
-            if (startTime >= 0) {
-                CharSequence timeText = getTimeText(startTime);
+            CharSequence timeText = getTimeText(startTime);
+            if (timeText != null) {
                 canvas.drawText(timeText, 0, timeText.length(), textX, textY, mTextPaint);
             }
 
@@ -189,15 +323,12 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         canvas.restore();
     }
 
-    @NonNull
+    @Nullable
     private CharSequence getTimeText(int second) {
-        int minute = second / 60;
-        second %= 60;
-
-        mCachedTimeTextStingBuilder.delete(0, mCachedTimeTextStingBuilder.length());
-        mCachedTimeTextFormatter.format("%02d:%02d", minute, second);
-
-        return mCachedTimeTextStingBuilder;
+        if (mRulerAdapter == null) {
+            return null;
+        }
+        return mRulerAdapter.getTimeString(second);
     }
 
     /**
@@ -240,6 +371,10 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         super.onSizeChanged(w, h, oldw, oldh);
         constructRulerPath(w, h, oldw, oldh);
         constructPointerPath(w, h, oldw, oldh);
+
+        if (mLayoutStrategy != null) {
+            mLayoutStrategy.onViewSizeChanged(this, w, h);
+        }
 
         mPointerPositionX = w / 2;
 
@@ -481,10 +616,16 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     }
 
     public interface RulerAdapter {
+        CharSequence getTimeString(long timeSecond);
+
         long getTotalTime();
 
         /** @return ranged [0, 100] */
         int getDataForTime(long timeMillis);
+    }
+
+    public interface LayoutStrategy {
+        void onViewSizeChanged(@NonNull AudioTimeRulerView view, int width, int height);
     }
 
     /**
