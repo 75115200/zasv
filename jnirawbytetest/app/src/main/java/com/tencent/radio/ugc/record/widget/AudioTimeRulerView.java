@@ -513,7 +513,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
                 this.duration = duration;
             } else {
                 // incremental construct
-                addWaveToPath(this.duration, startTime - this.duration, duration - this.duration);
+                addWaveToPath(this.duration, startTime + this.duration, duration - this.duration);
                 this.duration = duration;
             }
             partialBuild = duration < PATH_TIME_DURATION_MILLIS;
