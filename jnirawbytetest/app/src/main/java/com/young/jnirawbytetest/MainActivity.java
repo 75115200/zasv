@@ -29,7 +29,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public int getDataForTime(long timeMillis) {
-                return (int) (Math.abs(Math.sin(timeMillis * Math.PI * 2 / 4000)) * 100);
+                if (timeMillis < 0) {
+                    return 2;
+                }
+                return (int) (Math.abs(Math.sin(timeMillis * Math.PI * 2 / 4000)) * 90);
             }
         });
 

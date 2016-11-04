@@ -134,8 +134,6 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.i(TAG,
-                "onDraw mWaveScrollX=" + mWaveScrollX + " time=" + getCurrentStartTime() + " offset=" + getCurrentScrollOffset());
 
         drawRuler(canvas);
 
@@ -184,7 +182,6 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         canvas.drawPath(mPointerPath, mPathPaint);
         canvas.restore();
     }
-
 
     @NonNull
     private CharSequence getTimeText(int second) {
@@ -249,7 +246,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         mRulerPath.moveTo(0, mRulerHeight);
         mRulerPath.lineTo(getWidth() + mRulerSecondWidth, mRulerHeight);
 
-        final int linesToDraw = mRulerPrecision * Math.round((width + mRulerSecondWidth) / mRulerSecondWidth);
+        final int linesToDraw = (int) (mRulerPrecision * Math.ceil((width + mRulerSecondWidth) / mRulerSecondWidth));
         final float precision = mRulerSecondWidth / mRulerPrecision;
 
         mRulerPath.moveTo(0, mRulerHeight);
@@ -297,11 +294,11 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         final long startTimeMillis = getCurrentStartTime() * 1000;
         final long pathTimeDuration = 1000;
         final int pathSegmentCountToDisplay =
-                (int) Math.ceil((getWidth() - getCurrentScrollOffset()) / mRulerSecondWidth);
+                (int) Math.ceil((getWidth() + getCurrentScrollOffset()) / mRulerSecondWidth);
         final long endTimeMillis =
                 Math.min(startTimeMillis + pathTimeDuration * pathSegmentCountToDisplay,
                         mRulerAdapter.getTotalTime());
-        final long lastSegmentStartTime = endTimeMillis % 1000;
+        final long lastSegmentStartTime = endTimeMillis - (1 + (endTimeMillis - 1) % pathTimeDuration);
 
         if (getLivePathSegmentsStartTime() == startTimeMillis &&
                 getLivePathSegmentsEndTime() == endTimeMillis) {
@@ -312,17 +309,17 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         //// TODO: 04/11/2016
         recycleAllPathSegment();
         addPathSegment(startTimeMillis, endTimeMillis, pathTimeDuration, true);
-
-        if (mLivePathSegments.isEmpty()) {
-            addPathSegment(startTimeMillis, endTimeMillis, pathTimeDuration, true);
-        } else {
-            PathSegment lastSegment = mLivePathSegments.getLast();
-            if (lastSegment.startTime + lastSegment.duration != endTimeMillis) {
-                // remove partial built segment
-                mLivePathSegments.removeLast();
-            }
-            addPathSegmentIncrementally(startTimeMillis, pathTimeDuration, endTimeMillis, lastSegmentStartTime);
-        }
+//
+//        if (mLivePathSegments.isEmpty()) {
+//            addPathSegment(startTimeMillis, endTimeMillis, pathTimeDuration, true);
+//        } else {
+//            PathSegment lastSegment = mLivePathSegments.getLast();
+//            if (lastSegment.startTime + lastSegment.duration != endTimeMillis) {
+//                // remove partial built segment
+//                mLivePathSegments.removeLast();
+//            }
+//            addPathSegmentIncrementally(startTimeMillis, pathTimeDuration, endTimeMillis, lastSegmentStartTime);
+//        }
     }
 
     private void addPathSegmentIncrementally(
@@ -430,13 +427,14 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     }
 
     private void recyclePathSegment(@NonNull PathSegment pathSegment) {
+        pathSegment.recycle();
         mCrappedPathSegments.add(pathSegment);
     }
 
     @NonNull
     private PathSegment obtainPathSegment() {
         if (!mCrappedPathSegments.isEmpty()) {
-            return mCrappedPathSegments.get(0);
+            return mCrappedPathSegments.pop();
         }
 
         return new PathSegment();
@@ -463,14 +461,14 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
      */
     private class PathSegment {
         public final Path path = new Path();
-        public float totalHeight;
         public long startTime;
         public long duration;
+        public float totalHeight;
 
         public void constructPath(long startTime, long duration) {
             totalHeight = (int) ((getHeight() - mRulerHeight) / 2);
 
-            if (this.startTime != startTime || this.duration < duration) {
+            if (this.startTime != startTime || this.duration > duration) {
                 // construct new
                 path.rewind();
                 addWaveToPath(0, startTime, duration);
@@ -519,9 +517,29 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
             canvas.drawPath(path, mPathPaint);
             canvas.restore();
         }
+
+        public void recycle() {
+            path.rewind();
+            startTime = duration = 0;
+            totalHeight = 0;
+        }
+
+        @Override
+        public String toString() {
+            return "PathSegment{" +
+                    "startTime=" + startTime +
+                    ", duration=" + duration +
+                    ", totalHeight=" + totalHeight +
+                    '}';
+        }
     }
 
-    // Mark: Gesture
+    // Mark: Gesture and scroll
+    @Override
+    public void scrollTo(int x, int y) {
+        mScroller.startScroll((int) mWaveScrollX, 0, x, 0);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return mGestureDetector.onTouchEvent(event);
@@ -532,8 +550,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         super.computeScroll();
 
         if (mScroller.computeScrollOffset()) {
-            int x = mScroller.getCurrX();
-            mWaveScrollX = x;
+            mWaveScrollX = mScroller.getCurrX();
             invalidate();
         }
     }
