@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         rulerView.setRulerAdapter(new AudioTimeRulerView.RulerAdapter() {
             @Override
             public long getTotalTime() {
-                return 1000000;
+                return 4500;
             }
 
             @Override

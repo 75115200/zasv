@@ -19,8 +19,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Locale;
 
-import static android.R.attr.duration;
-
 /**
  * <pre>
  * Author: taylorcyang@tencent.com
@@ -77,7 +75,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     private final OverScroller mScroller;
 
     private float mWaveScrollX;
-    private int mMinScrollX;
+    private int mScrollXInitialOffset;
 
     // MARK: data
     private RulerAdapter mRulerAdapter;
@@ -239,7 +237,9 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         constructPointerPath(w, h, oldw, oldh);
 
         mPointerPositionX = w / 2;
-        mMinScrollX = -w / 2;
+
+        mScrollXInitialOffset = -w / 2;
+        adjustPosition(true, false);
     }
 
     private void constructRulerPath(int width, int height, int oldWidth, int oldHeight) {
@@ -548,6 +548,44 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         }
     }
 
+    private float getMaxScroll() {
+        float dataLengthInPixel = 0;
+        if (mRulerAdapter != null) {
+            dataLengthInPixel = mRulerAdapter.getTotalTime() * mRulerSecondWidth / 1000;
+        }
+        return dataLengthInPixel + mScrollXInitialOffset;
+    }
+
+    private void adjustPosition(boolean forceAdjust, boolean doAnimation) {
+        if (!mScroller.isFinished()) {
+            // do nothing when scrolling
+            return;
+        }
+
+        boolean needAdjust = forceAdjust;
+        int targetScroll = mScrollXInitialOffset;
+        final float maxScroll;
+
+        if (mWaveScrollX < mScrollXInitialOffset) {
+            targetScroll = mScrollXInitialOffset;
+            needAdjust = true;
+        } else if (mWaveScrollX > (maxScroll = getMaxScroll())) {
+            targetScroll = (int) maxScroll;
+            needAdjust = true;
+        }
+
+        if (needAdjust) {
+            if (doAnimation) {
+                mScroller.startScroll(
+                        (int) mWaveScrollX, 0,
+                        (int) (targetScroll - mWaveScrollX), 0);
+            } else {
+                mWaveScrollX = targetScroll;
+            }
+            invalidate();
+        }
+    }
+
     // Mark: Gesture and scroll
     @Override
     public void scrollTo(int x, int y) {
@@ -556,7 +594,13 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return mGestureDetector.onTouchEvent(event);
+        boolean consumed = mGestureDetector.onTouchEvent(event);
+        if (event.getActionMasked() == MotionEvent.ACTION_UP
+                || event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
+            adjustPosition(false, true);
+            return true;
+        }
+        return consumed;
     }
 
     @Override
@@ -589,10 +633,9 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
                 (int) mWaveScrollX, 0,
                 (int) -velocityX, 0,
                 //min/max X
-                mMinScrollX,
-                100000,
+                mScrollXInitialOffset, (int) getMaxScroll(),
                 0, 0,
-                getWidth() / 2, 0);
+                (int) mRulerSecondWidth, 0);
 
         invalidate();
         return true;
@@ -611,6 +654,22 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
+        if (mScroller.isFinished()) {
+            if (mWaveScrollX < mScrollXInitialOffset) {
+                mScroller.startScroll(
+                        (int) mWaveScrollX, 0,
+                        (int) (mScrollXInitialOffset - mWaveScrollX), 0);
+            } else {
+                float maxScrollX = 0;
+                if (mRulerAdapter != null) {
+                    maxScrollX = mRulerAdapter.getTotalTime() * mRulerSecondWidth / 1000;
+                }
+                if (mWaveScrollX > maxScrollX) {
+                    mScroller.startScroll((int) maxScrollX, 0,
+                            (int) (maxScrollX - mWaveScrollX), 0);
+                }
+            }
+        }
         return true;
     }
 
