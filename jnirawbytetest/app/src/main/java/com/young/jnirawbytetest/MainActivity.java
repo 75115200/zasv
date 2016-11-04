@@ -8,18 +8,40 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
 import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
+
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     Thread mRunningThread;
 
+    private void initRuler() {
+        AudioTimeRulerView rulerView = (AudioTimeRulerView) findViewById(R.id.time_ruler);
+        rulerView.setRulerAdapter(new AudioTimeRulerView.RulerAdapter() {
+            @Override
+            public long getTotalTime() {
+                return 1000000;
+            }
+
+            @Override
+            public int getDataForTime(long timeMillis) {
+                return (int) (Math.abs(Math.sin(timeMillis * Math.PI * 2 / 4000)) * 100);
+            }
+        });
+
+        rulerView.notifyDataSetChanged();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initRuler();
 
         findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
             @Override
