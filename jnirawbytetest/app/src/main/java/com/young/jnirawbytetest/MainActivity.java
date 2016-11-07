@@ -2,8 +2,8 @@ package com.young.jnirawbytetest;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,6 +14,9 @@ import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
 import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 
+import java.util.Formatter;
+import java.util.Locale;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -21,17 +24,52 @@ public class MainActivity extends AppCompatActivity {
     Thread mRunningThread;
 
     Handler h = new Handler();
-    long totalTime = 0;
+    long totalTime = 10000;
 
     private void initRuler() {
         final AudioTimeRulerView rulerView = (AudioTimeRulerView) findViewById(R.id.time_ruler);
+        rulerView.setPointerDrawable(getResources().getDrawable(R.drawable.line_radio));
+        rulerView.setRulerColor(getResources().getColor(R.color.radio_time_ruler_line));
+        rulerView.setTextColor(getResources().getColor(R.color.radio_time_ruler_text));
+
+        rulerView.setTextSize(getResources().getDimension(R.dimen.radio_time_ruler_text));
+        rulerView.setRulerTextPadding(getResources().getDimension(R.dimen.radio_time_ruler_text_padding));
+        //rulerView.setRulerSecondWidth(getResources().getDimension(R.dimen.radio_time_ruler_second_width));
+        rulerView.setRulerStrokeWidth(200);
+        rulerView.setRulerHeight(getResources().getDimension(R.dimen.radio_time_ruler_height));
+        rulerView.setRulerSecondaryHeight(getResources().getDimension(R.dimen.radio_time_ruler_secondary_height));
+        rulerView.setRulerStrokeWidth(1);
+        rulerView.setWaveStrokeWidth(2);
+        rulerView.setWaveColor(getResources().getColor(R.color.radio_time_ruler_line));
+
+        rulerView.setRulerPrecision(4);
+        rulerView.setWaveScalePrecision(20);
+
+        rulerView.setLayoutStrategy(new AudioTimeRulerView.LayoutStrategy() {
+            @Override
+            public void onViewSizeChanged(@NonNull AudioTimeRulerView view, int width, int height) {
+                // display 6s
+//                view.setRulerSecondWidth(width / 6);
+                view.setScrollXInitialOffset(-width / 2);
+                view.setPointerPositionX(width / 2);
+            }
+        });
+
         rulerView.setRulerAdapter(new AudioTimeRulerView.RulerAdapter() {
+            StringBuilder sb = new StringBuilder();
+            Formatter mFormatter = new Formatter(sb, Locale.US);
             @Override
             public CharSequence getTimeString(long timeSecond) {
                 if (timeSecond < 0) {
                     return null;
                 }
-                return DateFormat.format("mm:ss", timeSecond * 1000);
+                int timeMin = (int) (timeSecond / 60);
+                timeSecond %= 60;
+
+                // avoid too much memory allocation
+                sb.delete(0, sb.length());
+                mFormatter.format("%02d:%02d", timeMin, (int) timeSecond);
+                return sb;
             }
 
             @Override
@@ -42,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public int getDataForTime(long timeMillis) {
                 if (timeMillis < 0) {
-                    return 2;
+                    return 0;
                 }
                 int count = (int) (timeMillis / 50);
                 return (int) ((count % 40) * (100f / 40));
@@ -55,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 totalTime += 50;
                 rulerView.notifyDataAdded(totalTime - 50, 50);
 
-                h.postDelayed(this, 50);
+//                h.postDelayed(this, 50);
             }
         });
 

@@ -3,4 +3,14 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <color name="radio_time_ruler_text">#2c2c2c</color>
+    <color name="radio_time_ruler_line">#787369</color>
+
+    <dimen name="radio_time_ruler_text_padding">4dp</dimen>
+    <dimen name="radio_time_ruler_second_width">60dp</dimen>
+    <dimen name="radio_time_ruler_text">11sp</dimen>
+    <dimen name="radio_time_ruler_height">18dp</dimen>
+    <dimen name="radio_time_ruler_secondary_height">5dp</dimen>
 </resources>

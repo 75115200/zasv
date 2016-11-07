@@ -5,22 +5,20 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.OverScroller;
-import android.widget.Scroller;
 
-import java.util.Formatter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.Locale;
 
 /**
  * <pre>
@@ -36,7 +34,6 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     private final Paint mPathPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path mRulerPath = new Path();
-    private final Path mPointerPath = new Path();
 
     private static final long PATH_TIME_DURATION_MILLIS = 1000;
 
@@ -56,13 +53,11 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     private float mWaveStrokeWidth;
 
     private float mRulerStrokeWidth;
-    private float mPointerStrokeWidth;
-    private float mPointerTriangleWidth;
+    private Drawable mPointerDrawable;
+    private float mPointerDrawableWidth = -1;
 
     @ColorInt
     private int mRulerColor = Color.WHITE;
-    @ColorInt
-    private int mPointerColor = Color.WHITE;
     @ColorInt
     private int mWaveColor = Color.WHITE;
 
@@ -73,7 +68,6 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     // Motion
     private final GestureDetector mGestureDetector;
     private final OverScroller mGestureScroller;
-    private final Scroller mAutoScroller;
 
     private float mWaveScrollX;
     private int mScrollXInitialOffset;
@@ -99,7 +93,6 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
         mGestureDetector = new GestureDetector(context, this);
         mGestureScroller = new OverScroller(context);
-        mAutoScroller = new Scroller(context, new LinearInterpolator());
 
         initFakeData();
     }
@@ -186,36 +179,29 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         mRulerStrokeWidth = rulerStrokeWidth;
     }
 
-    public float getPointerStrokeWidth() {
-        return mPointerStrokeWidth;
-    }
-
-    public void setPointerStrokeWidth(float pointerStrokeWidth) {
-        mPointerStrokeWidth = pointerStrokeWidth;
-    }
-
-    public float getPointerTriangleWidth() {
-        return mPointerTriangleWidth;
-    }
-
-    public void setPointerTriangleWidth(float pointerTriangleWidth) {
-        mPointerTriangleWidth = pointerTriangleWidth;
-    }
-
     public int getRulerColor() {
         return mRulerColor;
     }
 
-    public void setRulerColor(int rulerColor) {
+    public void setRulerColor(@ColorInt int rulerColor) {
         mRulerColor = rulerColor;
     }
 
-    public int getPointerColor() {
-        return mPointerColor;
+    public void setTextColor(@ColorInt int textColor) {
+        mTextPaint.setColor(textColor);
     }
 
-    public void setPointerColor(int pointerColor) {
-        mPointerColor = pointerColor;
+    @ColorInt
+    public int getTextColor() {
+        return mTextPaint.getColor();
+    }
+
+    public void setTextSize(float textSize) {
+        mTextPaint.setTextSize(textSize);
+    }
+
+    public float getTextSize() {
+        return mTextPaint.getTextSize();
     }
 
     public int getWaveColor() {
@@ -232,6 +218,22 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     public void setPointerPositionX(float pointerPositionX) {
         mPointerPositionX = pointerPositionX;
+    }
+
+    public Drawable getPointerDrawable() {
+        return mPointerDrawable;
+    }
+
+    public void setPointerDrawable(Drawable pointerDrawable) {
+        mPointerDrawable = pointerDrawable;
+    }
+
+    public float getPointerDrawableWidth() {
+        return mPointerDrawableWidth;
+    }
+
+    public void setPointerDrawableWidth(float pointerDrawableWidth) {
+        mPointerDrawableWidth = pointerDrawableWidth;
     }
 
     public boolean isTouchable() {
@@ -258,12 +260,9 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         mWaveScalePrecision = 20;
         mWaveStrokeWidth = 2;
 
-        mPointerColor = Color.CYAN;
         mRulerColor = Color.WHITE;
         mRulerTextPadding = 10;
         mRulerStrokeWidth = 2;
-        mPointerStrokeWidth = 2;
-        mPointerTriangleWidth = 30;
 
         mPointerPositionX = 230;
 
@@ -291,36 +290,43 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         mPathPaint.setColor(mRulerColor);
         mPathPaint.setStrokeWidth(mRulerStrokeWidth);
 
+        // debug
+        //canvas.drawText("t=" + startTime + " x=" + mWaveScrollX + " off=" + offset, 10, 100, mTextPaint);
+
         // draw ruler line
         canvas.save();
         canvas.translate(-offset, 0);
         canvas.drawPath(mRulerPath, mPathPaint);
         canvas.restore();
 
-        // draw ruler time test
-        float textX = -offset + mRulerTextPadding;
-        final float textY = mRulerHeight - mRulerSecondaryHeight - mRulerTextPadding;
+        if (mRulerAdapter != null) {
+            // draw ruler time text
+            float textX = -offset + mRulerTextPadding;
+            final float textY = mRulerHeight - mRulerSecondaryHeight - mRulerTextPadding;
 
-        while (textX < getWidth()) {
-            CharSequence timeText = getTimeText(startTime);
-            if (timeText != null) {
-                canvas.drawText(timeText, 0, timeText.length(), textX, textY, mTextPaint);
+            while (textX < getWidth()) {
+                CharSequence timeText = getTimeText(startTime);
+                if (timeText != null) {
+                    canvas.drawText(timeText, 0, timeText.length(), textX, textY, mTextPaint);
+                }
+
+                textX += mRulerSecondWidth;
+                startTime++;
             }
-
-            textX += mRulerSecondWidth;
-            startTime++;
         }
     }
 
     private void drawPointer(Canvas canvas) {
         mPathPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPathPaint.setStrokeWidth(mPointerStrokeWidth);
-        mPathPaint.setColor(mPointerColor);
 
-        canvas.save();
-        canvas.translate(mPointerPositionX, mRulerHeight);
-        canvas.drawPath(mPointerPath, mPathPaint);
-        canvas.restore();
+        if (mPointerDrawable != null) {
+            int dw = mPointerDrawableWidth < 0 ? mPointerDrawable.getIntrinsicWidth() : (int) mPointerDrawableWidth;
+            mPointerDrawable.setBounds(0, 0, mPointerDrawable.getIntrinsicWidth(), (int) (getHeight() - mRulerHeight));
+            canvas.save();
+            canvas.translate(mPointerPositionX - dw / 2, mRulerHeight);
+            mPointerDrawable.draw(canvas);
+            canvas.restore();
+        }
     }
 
     @Nullable
@@ -335,16 +341,15 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
      * @return second
      */
     private int getCurrentStartTime() {
-        int time = (int) (mWaveScrollX / mRulerSecondWidth);
-        if (mWaveScrollX < 0) {
-            // normalize negative
-            time--;
-        }
+        int time = (int) Math.floor(mWaveScrollX / mRulerSecondWidth);
+
+        Log.i(TAG, "currentStartTime=" + time);
+
         return time;
     }
 
     private float getCurrentScrollOffset() {
-        int offset = (int) (mWaveScrollX % mRulerSecondWidth);
+        float offset = mWaveScrollX % mRulerSecondWidth;
         if (offset >= 0) {
             return offset;
         } else {
@@ -369,16 +374,12 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        constructRulerPath(w, h, oldw, oldh);
-        constructPointerPath(w, h, oldw, oldh);
 
         if (mLayoutStrategy != null) {
             mLayoutStrategy.onViewSizeChanged(this, w, h);
         }
 
-        mPointerPositionX = w / 2;
-
-        mScrollXInitialOffset = -w / 2;
+        constructRulerPath(w, h, oldw, oldh);
         adjustPosition(true, false);
     }
 
@@ -396,7 +397,7 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
         for (int i = 0; i < linesToDraw; i++) {
             float rulerHeight;
             if ((i % mRulerPrecision) == 0) {
-                //lone ruler
+                //long ruler
                 rulerHeight = mRulerHeight;
             } else {
                 //short ruler
@@ -406,26 +407,6 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
             mRulerPath.rLineTo(0, -rulerHeight);
             mRulerPath.rMoveTo(precision, rulerHeight);
         }
-    }
-
-    private void constructPointerPath(int width, int height, int oldWidth, int oldHeight) {
-        if (height == oldHeight) return;
-
-        height -= mRulerHeight;
-
-        @SuppressWarnings("SuspiciousNameCombination")
-        final float triangleHeight = mPointerTriangleWidth;
-
-        mPointerPath.rewind();
-        //draw triangle first
-        mPointerPath.moveTo(0, triangleHeight);
-        mPointerPath.rLineTo(-mPointerTriangleWidth / 2, -triangleHeight);
-        mPointerPath.rLineTo(mPointerTriangleWidth, 0);
-        mPointerPath.close();
-
-        //draw vertical line
-        mPointerPath.moveTo(0, triangleHeight);
-        mPointerPath.rLineTo(0, height - triangleHeight);
     }
 
     private void updateWavePath() {
@@ -870,4 +851,8 @@ public class AudioTimeRulerView extends View implements GestureDetector.OnGestur
 
     }
 
+    @Override
+    protected boolean verifyDrawable(Drawable who) {
+        return super.verifyDrawable(who) || who == mPointerDrawable;
+    }
 }

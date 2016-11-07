@@ -7,15 +7,28 @@
     android:layout_height="match_parent"
     >
 
-
-    <com.tencent.radio.ugc.record.widget.AudioTimeRulerView
-        android:id="@+id/time_ruler"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:background="@android:color/background_dark"
-        android:contentDescription="刻度"
-        android:layout_marginTop="96dp"
+        android:layout_height="200dp"
+        android:paddingTop="10dp"
+        android:background="@drawable/bg_normal"
+        >
+
+        <com.tencent.radio.ugc.record.widget.AudioTimeRulerView
+            android:id="@+id/time_ruler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="刻度"
         />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/radio_time_ruler_line"
+            android:layout_gravity="bottom"
+            />
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/activity_main"
