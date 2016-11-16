@@ -28,30 +28,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void initRuler() {
         final AudioTimeRulerView rulerView = (AudioTimeRulerView) findViewById(R.id.time_ruler);
-        rulerView.setPointerDrawable(getResources().getDrawable(R.drawable.line_radio));
+//        rulerView.setPointerDrawable(getResources().getDrawable(R.mipmap.line_radio));
         rulerView.setRulerColor(getResources().getColor(R.color.radio_time_ruler_line));
         rulerView.setTextColor(getResources().getColor(R.color.radio_time_ruler_text));
 
         rulerView.setTextSize(getResources().getDimension(R.dimen.radio_time_ruler_text));
         rulerView.setRulerTextPadding(getResources().getDimension(R.dimen.radio_time_ruler_text_padding));
-        //rulerView.setRulerSecondWidth(getResources().getDimension(R.dimen.radio_time_ruler_second_width));
-        rulerView.setRulerStrokeWidth(200);
+        rulerView.setRulerSecondWidth(getResources().getDimension(R.dimen.radio_time_ruler_second_width));
         rulerView.setRulerHeight(getResources().getDimension(R.dimen.radio_time_ruler_height));
         rulerView.setRulerSecondaryHeight(getResources().getDimension(R.dimen.radio_time_ruler_secondary_height));
         rulerView.setRulerStrokeWidth(1);
-        rulerView.setWaveStrokeWidth(2);
         rulerView.setWaveColor(getResources().getColor(R.color.radio_time_ruler_line));
 
         rulerView.setRulerPrecision(4);
         rulerView.setWaveScalePrecision(20);
+        rulerView.setMode(AudioTimeRulerView.MODE_FOLLOW_NEW_DATA);
 
         rulerView.setLayoutStrategy(new AudioTimeRulerView.LayoutStrategy() {
             @Override
             public void onViewSizeChanged(@NonNull AudioTimeRulerView view, int width, int height) {
                 // display 6s
-//                view.setRulerSecondWidth(width / 6);
+                view.setRulerSecondWidth(width / 6);
                 view.setScrollXInitialOffset(-width / 2);
                 view.setPointerPositionX(width / 2);
+                view.setWaveStrokeWidth(width / 6 / view.getWaveScalePrecision() / 2);
             }
         });
 
@@ -92,8 +92,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 totalTime += 50;
                 rulerView.notifyDataAdded(totalTime - 50, 50);
-
-//                h.postDelayed(this, 50);
+                h.postDelayed(this, 50);
             }
         });
 
