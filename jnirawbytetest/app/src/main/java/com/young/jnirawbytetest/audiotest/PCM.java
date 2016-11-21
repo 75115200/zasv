@@ -14,6 +14,7 @@ public class PCM {
                        .getAbsolutePath();
 
     public static final String MONO = path + "/mono.pcm";
+    public static final String MONO2 = path + "/pp.mono.pcm.raw";
     public static final String MONO_MUSIC = path + "/bgm.mono.pcm";
     public static final String STEREO = path + "/haha.stereo.pcm";
     public static final String STEREO_MUSIC = path + "/bgm.stereo.pcm";

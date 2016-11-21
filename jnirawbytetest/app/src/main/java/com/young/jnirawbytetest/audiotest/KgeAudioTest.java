@@ -5,8 +5,13 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.tencent.audioeffect.effect.KalaReverb;
-import com.tencent.audioeffect.effect.KalaVolumeScaler;
+import com.tencent.audioeffect.effect.impl.KalaAudioGain;
+import com.tencent.audioeffect.effect.impl.KalaClean;
+import com.tencent.audioeffect.effect.impl.KalaMix;
+import com.tencent.audioeffect.effect.impl.KalaReverb;
+import com.tencent.audioeffect.effect.impl.KalaToneShift;
+import com.tencent.audioeffect.effect.impl.KalaVoiceShift;
+import com.tencent.audioeffect.effect.impl.KalaVolumeScaler;
 import com.tencent.component.media.effect.VoiceChangerWrapper;
 import com.young.jnirawbytetest.IOUtils;
 import com.young.jnirawbytetest.audiotest.logic.PCMAudioPlayer;
@@ -49,7 +54,7 @@ public class KgeAudioTest {
         byte[] buffer = new byte[bufferSize];
 
         InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO));
-        KalaClean2 clean2 = new KalaClean2(44100, 1);
+        KalaClean clean2 = new KalaClean(44100, 1);
 
         int readLen;
         while (!Thread.interrupted() &&
@@ -247,7 +252,7 @@ public class KgeAudioTest {
         Log.i(TAG, "reverb: idDefault=" + idDefault);
         Log.i(TAG, "reverb: idRange=[" + minId + ", " + maxId + "]");
 
-        final int bufferSize = 1024 * 8;
+        final int bufferSize = 2048;
         byte[] buffer = new byte[bufferSize];
         final int outBufferSize = bufferSize;
         byte[] outbuf = new byte[outBufferSize];
@@ -256,11 +261,11 @@ public class KgeAudioTest {
         format.sampleRate = 44100;
         format.audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         format.outChannelConfig = AudioFormat.CHANNEL_OUT_MONO;
-        format.bufferSize = bufferSize;//PCMAudioPlayer.getMinBuffeSize(format);
+        format.bufferSize = bufferSize; //PCMAudioPlayer.getMinBuffeSize(format);
         PCMAudioPlayer p = new PCMAudioPlayer(format);
         Bundle outParam = new Bundle();
 
-        InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO_MUSIC));
+        InputStream in = new BufferedInputStream(new FileInputStream(PCM.MONO2));
 
         kalaReverb.setTypeId(typeId);
 

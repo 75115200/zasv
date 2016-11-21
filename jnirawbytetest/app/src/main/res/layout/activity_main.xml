@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+
+<ViewAnimator
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.young.jnirawbytetest.MainActivity"
+    android:id="@+id/animator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:inAnimation="@android:anim/slide_in_left"
+    android:outAnimation="@android:anim/slide_out_right"
     >
 
     <FrameLayout
@@ -19,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="刻度"
-        />
+            />
 
         <View
             android:layout_width="match_parent"
@@ -30,232 +34,236 @@
 
     </FrameLayout>
 
-    <LinearLayout
-        android:id="@+id/activity_main"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:context="com.young.jnirawbytetest.MainActivity"
         >
 
-        <Button
-            android:id="@+id/clean2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text="clean2"
-            android:textSize="22sp"
-            />
-
-        <Button
-            android:id="@+id/mix"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text="mix"
-            android:textSize="22sp"
-            />
-
         <LinearLayout
+            android:id="@+id/activity_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             >
 
             <Button
-                android:id="@+id/voice_shift"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:id="@+id/clean2"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                android:text="voice shift"
+                android:text="clean2"
                 android:textSize="22sp"
                 />
-
-            <Spinner
-                android:id="@+id/shift_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
 
             <Button
-                android:id="@+id/tone"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:id="@+id/mix"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                android:text="toneShift"
+                android:text="mix"
                 android:textSize="22sp"
                 />
 
-            <EditText
-                android:id="@+id/tone_val"
-                android:layout_width="80dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:hint="[-12, 12]"
-                android:gravity="center"
-                />
+                android:orientation="horizontal"
+                >
 
-        </LinearLayout>
+                <Button
+                    android:id="@+id/voice_shift"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:text="voice shift"
+                    android:textSize="22sp"
+                    />
+
+                <Spinner
+                    android:id="@+id/shift_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    android:id="@+id/tone"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:text="toneShift"
+                    android:textSize="22sp"
+                    />
+
+                <EditText
+                    android:id="@+id/tone_val"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberSigned"
+                    android:hint="[-12, 12]"
+                    android:gravity="center"
+                    />
+
+            </LinearLayout>
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    android:id="@+id/reverb"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:text="reverb"
+                    android:textSize="22sp"
+                    />
+
+                <Spinner
+                    android:id="@+id/reverb_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    android:id="@+id/volume_scalar"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:text="volume sacler"
+                    android:textSize="22sp"
+                    />
+
+                <EditText
+                    android:id="@+id/scale_val"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:hint="[0, 200]"
+                    android:text="100"
+                    android:gravity="center"
+                    />
+
+            </LinearLayout>
 
             <Button
-                android:id="@+id/reverb"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:id="@+id/gain"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                android:text="reverb"
+                android:text="auto gain"
                 android:textSize="22sp"
                 />
-
-            <Spinner
-                android:id="@+id/reverb_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
 
             <Button
-                android:id="@+id/volume_scalar"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:id="@+id/stop"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                android:text="volume sacler"
+                android:text="stop it"
                 android:textSize="22sp"
                 />
 
-            <EditText
-                android:id="@+id/scale_val"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="[0, 200]"
-                android:text="100"
-                android:gravity="center"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@android:color/background_dark"
                 />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/gain"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text="auto gain"
-            android:textSize="22sp"
-            />
-
-        <Button
-            android:id="@+id/stop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text="stop it"
-            android:textSize="22sp"
-            />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@android:color/background_dark"
-            />
-
-        <Button
-            android:id="@+id/encode_m4a"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text="encode m4a"
-            />
-
-        <Button
-            android:id="@+id/encode_aac"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text="encode aac"
-            />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
 
             <Button
-                android:id="@+id/super_sound"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:id="@+id/encode_m4a"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                android:text="super_sound"
-                android:textSize="22sp"
+                android:text="encode m4a"
                 />
-
-            <Spinner
-                android:id="@+id/super_sound_spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
 
             <Button
-                android:id="@+id/voice_speed"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:id="@+id/encode_aac"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                android:text="voice speed"
-                android:textSize="22sp"
+                android:text="encode aac"
                 />
 
-            <Spinner
-                android:id="@+id/channel_speed_spinner"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                />
+                android:orientation="horizontal"
+                >
 
-            <Spinner
-                android:id="@+id/voice_speed_spinner"
-                android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/super_sound"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:text="super_sound"
+                    android:textSize="22sp"
+                    />
+
+                <Spinner
+                    android:id="@+id/super_sound_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                />
+                android:orientation="horizontal"
+                >
+
+                <Button
+                    android:id="@+id/voice_speed"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:text="voice speed"
+                    android:textSize="22sp"
+                    />
+
+                <Spinner
+                    android:id="@+id/channel_speed_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+
+                <Spinner
+                    android:id="@+id/voice_speed_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</FrameLayout>
+    </ScrollView>
+</ViewAnimator>
 

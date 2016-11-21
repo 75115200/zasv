@@ -1,4 +1,4 @@
-package com.young.jnirawbytetest.audiotest;
+package com.tencent.audioeffect.effect.impl;
 
 
 import io.github.landerlyoung.jenny.NativeClass;
@@ -11,10 +11,10 @@ import io.github.landerlyoung.jenny.NativeCode;
  * Life with Passion, Code with Creativity.
  */
 @NativeClass
-public class KalaClean2 {
+public class KalaClean {
     private long mNativeHandel;
 
-    public KalaClean2(int sampleRate, int channel) {
+    public KalaClean(int sampleRate, int channel) {
         mNativeHandel = createClean2(sampleRate, channel);
     }
 

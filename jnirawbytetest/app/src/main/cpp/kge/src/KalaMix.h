@@ -7,7 +7,7 @@
  * or contact author landerlyoung@gmail.com.
  */
 
-/* C++ header file for class com.young.jennysampleapp.ComputeIntensiveClass */
+/* C++ header file for class com.tencent.audioeffect.effect.impl.KalaMix */
 #pragma once
 
 #include <jni.h>
@@ -15,12 +15,12 @@
 namespace  KalaMix {
 
 //DO NOT modify
-static constexpr auto FULL_CLASS_NAME = "com/young/jnirawbytetest/audiotest/KalaMix";
+static constexpr auto FULL_CLASS_NAME = "com/tencent/audioeffect/effect/impl/KalaMix";
 
 
 
 /*
- * Class:     com_young_jnirawbytetest_audiotest_KalaMix
+ * Class:     com_tencent_audioeffect_effect_impl_KalaMix
  * Method:    private static long create(int sampleRate, int bgmChannelCount, int vocalChannelCount)
  * Signature: (III)J
  */
@@ -28,7 +28,7 @@ jlong create(JNIEnv *env, jclass clazz, jint sampleRate, jint bgmChannelCount, j
 
 
 /*
- * Class:     com_young_jnirawbytetest_audiotest_KalaMix
+ * Class:     com_tencent_audioeffect_effect_impl_KalaMix
  * Method:    private static int process(long handel, byte[] bgm, int bgmSize, byte[] vocal, int vocalSize, byte[] out, int outSize)
  * Signature: (J[BI[BI[BI)I
  */
@@ -36,7 +36,7 @@ jint process(JNIEnv *env, jclass clazz, jlong handel, jbyteArray bgm, jint bgmSi
 
 
 /*
- * Class:     com_young_jnirawbytetest_audiotest_KalaMix
+ * Class:     com_tencent_audioeffect_effect_impl_KalaMix
  * Method:    private void release(long handel)
  * Signature: (J)V
  */

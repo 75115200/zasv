@@ -32,12 +32,17 @@ namespace KalaReverb {
 
 /*
  * Class:     com_tencent_audioeffect_effect_KalaReverb
- * Method:    private static long create(int sampleRate, int dualChannel)
+ * Method:    private static long create(int sampleRate, int channelCount)
  * Signature: (II)J
  */
 jlong create(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount) {
     CReverb4 *ins = new CReverb4();
     ins->Init(sampleRate, channelCount);
+    ReverbParam * pParam = new ReverbParam();
+    pParam->channelCount = (int32_t) channelCount;
+    pParam->sampleRate = (int32_t) sampleRate;
+    paramMap[reinterpret_cast<int64_t >(ins)] = pParam;
+    LOGV("create KalaReverb %d", reinterpret_cast<int64_t >(ins));
     return reinterpret_cast<jlong>(ins);
 }
 
@@ -112,16 +117,40 @@ jstring getNameId(JNIEnv *env, jclass clazz, jlong nativeHandel, jint typeId) {
  */
 jint process(JNIEnv *env, jclass clazz, jlong nativeHandel, jbyteArray inBuffer, jint insize,
              jbyteArray outBuffer, jint outSize) {
+    int ret = -1;
     CReverb4 *ins = reinterpret_cast<CReverb4 *>(nativeHandel);
     jboolean inCopy, outCopy;
+
 
     jbyte *in = env->GetByteArrayElements(inBuffer, &inCopy);
     jbyte *out = env->GetByteArrayElements(outBuffer, &outCopy);
 
-    int ret = ins->Process(
-            reinterpret_cast<char *>(in), insize,
-            reinterpret_cast<char *>(out), outSize);
+    ReverbParam* pParam = paramMap[reinterpret_cast<int64_t >(nativeHandel)];
+    if(pParam) {
+        // fetch 10 ms's data every time
+        const jint chunkSizeInSample = pParam->sampleRate * pParam->channelCount / 100;
+        // 16bit PCM
+        const jint chunkSizeInBytes = chunkSizeInSample * 2;
 
+        LOGI("reverb process sampleRate: %d, channel: %d, chunkSizeInBytes: %d", pParam->sampleRate, pParam->channelCount, chunkSizeInBytes);
+
+        jint readOffsetInBytes = 0;
+
+        //process audio grouped by 10ms
+        while (readOffsetInBytes < insize) {
+            bool success = true;
+            const jint audioLeft = insize - readOffsetInBytes;
+            const jint readSizeInBytes = std::min(chunkSizeInBytes, audioLeft);
+
+            ret = ins->Process(
+                    reinterpret_cast<char *>(in + readOffsetInBytes), readSizeInBytes,
+                    reinterpret_cast<char *>(out + readOffsetInBytes), readSizeInBytes);
+
+            //move input pointer forward to corresponding offset
+            readOffsetInBytes += readSizeInBytes;
+
+        }
+    }
     LOGV("%s in Size:%d IsCopy:%d; out Size:%d IsCopy:%d processLen:%d",
          __FUNCTION__, insize, inCopy, outSize, outCopy, ret);
 
@@ -138,6 +167,11 @@ jint process(JNIEnv *env, jclass clazz, jlong nativeHandel, jbyteArray inBuffer,
  * Signature: (J)V
  */
 void release(JNIEnv *env, jclass clazz, jlong nativeHandel) {
+    ReverbParam* pParam = paramMap[reinterpret_cast<int64_t >(nativeHandel)];
+    if(pParam) {
+        delete pParam;
+        paramMap[reinterpret_cast<int64_t >(nativeHandel)] = nullptr;
+    }
     CReverb4 *ins = reinterpret_cast<CReverb4 *>(nativeHandel);
     ins->Uninit();
     delete ins;
@@ -194,6 +228,7 @@ static const int gsMethodCount =
  * @returns success or not
  */
 bool registerNativeFunctions(JNIEnv *env) {
+        LOGI("KalaReverb registerNativeFunction");
     jclass clazz = env->FindClass(FULL_CLASS_NAME);
     return clazz != nullptr
            && 0 == env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);

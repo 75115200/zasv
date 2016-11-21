@@ -1,4 +1,4 @@
-package com.young.jnirawbytetest.audiotest;
+package com.tencent.audioeffect.effect.impl;
 
 
 import io.github.landerlyoung.jenny.NativeClass;

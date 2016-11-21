@@ -15,20 +15,20 @@
 namespace  KalaVolumeScaler {
 
 //DO NOT modify
-static constexpr auto FULL_CLASS_NAME = "com/tencent/audioeffect/effect/KalaVolumeScaler";
+static constexpr auto FULL_CLASS_NAME = "com/tencent/audioeffect/effect/impl/KalaVolumeScaler";
 
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaVolumeScaler
- * Method:    private static long create(int sampleRate, int dualChannel)
+ * Class:     com_tencent_audioeffect_effect_impl_KalaVolumeScaler
+ * Method:    private static long create(int sampleRate, int channelCount)
  * Signature: (II)J
  */
 jlong create(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaVolumeScaler
+ * Class:     com_tencent_audioeffect_effect_impl_KalaVolumeScaler
  * Method:    private static int setScaleFactor(long nativeHandel, int factor)
  * Signature: (JI)I
  */
@@ -36,7 +36,7 @@ jint setScaleFactor(JNIEnv *env, jclass clazz, jlong nativeHandel, jint factor);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaVolumeScaler
+ * Class:     com_tencent_audioeffect_effect_impl_KalaVolumeScaler
  * Method:    private static int process(long nativeHandel, byte[] inOutBuffer, int size)
  * Signature: (J[BI)I
  */
@@ -44,7 +44,7 @@ jint process(JNIEnv *env, jclass clazz, jlong nativeHandel, jbyteArray inOutBuff
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaVolumeScaler
+ * Class:     com_tencent_audioeffect_effect_impl_KalaVolumeScaler
  * Method:    private static void release(long nativeHandel)
  * Signature: (J)V
  */

@@ -13,22 +13,20 @@
 #include "CMixSound.h"
 #include "utils.h"
 
-#ifdef DEBUG
 
 #include <android/log.h>
 
+#ifdef DEBUG
 #define LOGV(...)   __android_log_print((int)ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define LOGD(...)   __android_log_print((int)ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define LOGI(...)   __android_log_print((int)ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
-#define LOGW(...)   __android_log_print((int)ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
-#define LOGE(...)   __android_log_print((int)ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #else
 #define LOGV(...)
 #define LOGD(...)
-#define LOGI(...)
-#define LOGW(...)
-#define LOGE(...)
 #endif
+
+#define LOGI(...)   __android_log_print((int)ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGW(...)   __android_log_print((int)ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+#define LOGE(...)   __android_log_print((int)ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 
 
@@ -63,12 +61,13 @@ public:
         if (requiredBufferSize > bufferSize) {
             buffer = reinterpret_cast<jbyte *> (
                     std::realloc(buffer, sizeof(jbyte) * requiredBufferSize));
-        }
 
-        if (buffer) {
-            bufferSize = requiredBufferSize;
-        } else {
-            //f**k, OOM!
+            if (buffer) {
+                bufferSize = requiredBufferSize;
+            } else {
+                //f**k, OOM!
+                LOGE("%s OOM occur requiredBufferSize:%d", __func__, requiredBufferSize);
+            }
         }
 
         return buffer;
@@ -100,9 +99,6 @@ jlong create(JNIEnv *env, jclass clazz,
              jint bgmChannelCount,
              jint vocalChannelCount)
 {
-    LOGV("%s sampleRate:%d, bgmChannelCount:%d, vocalChannelCount:%d",
-         __FUNCTION__, sampleRate, bgmChannelCount, vocalChannelCount);
-
     MixContext *ins = new MixContext(sampleRate, bgmChannelCount, vocalChannelCount);
     return reinterpret_cast<jlong>(ins);
 }
@@ -117,7 +113,9 @@ jint process(JNIEnv *env, jclass clazz,
              jlong handel,
              jbyteArray bgm, jint bgmSize,
              jbyteArray vocal, jint vocalSize,
-             jbyteArray out, jint outSize) {
+             jbyteArray out, jint outSize)
+{
+    LOGV("%s bgmSize:%d, vocalSize:%d", __FUNCTION__, bgmSize, vocalSize);
 
     MixContext *ins = reinterpret_cast<MixContext *>(handel);
     uint64_t start = radio::currentTimeUs();
@@ -163,7 +161,7 @@ jint process(JNIEnv *env, jclass clazz,
             vocalBuf = reinterpret_cast<char *>(tmpStereoBuf);
             vocalSize <<= 1;
         }
-        LOGE("expand time %lld us" , radio::currentTimeUs() - start);
+        LOGE("expand time %lld us", radio::currentTimeUs() - s);
     }
 
     uint64_t p = radio::currentTimeUs();
@@ -172,17 +170,30 @@ jint process(JNIEnv *env, jclass clazz,
             bgmBuf, bgmSize,
             vocalBuf, vocalSize,
             outBuf, outSize);
-    LOGI("process %lld us", radio::currentTimeUs() - p);
+    LOGV("process %lld us", radio::currentTimeUs() - p);
 
     env->ReleaseByteArrayElements(bgm, bgmBytes, JNI_ABORT);
     env->ReleaseByteArrayElements(vocal, vocalBytes, JNI_ABORT);
     env->ReleaseByteArrayElements(out, outBytes, 0);
 
-    LOGI("%s execution time %lld us, audio time %lld us",
+    LOGV("%s execution time %lld us, audio time %lld us",
          __FUNCTION__,
          radio::currentTimeUs() - start,
-         (uint64_t)outSize * 1000 * 1000 / (ins->dualChannel ? 4 : 2) / ins->sampleRate);
-    return ret;
+         (uint64_t) outSize * 1000 * 1000 / (ins->dualChannel ? 4 : 2) / ins->sampleRate);
+
+    if (ret >= 0) {
+        jint dualChannelDataSize;
+        if (ins->bgmChannelCount == 1) {
+            dualChannelDataSize = bgmSize << 1;
+        } else {
+            dualChannelDataSize = bgmSize;
+        }
+        LOGV("%s success return:", __func__, dualChannelDataSize);
+        return dualChannelDataSize;
+    } else {
+        LOGV("%s failed", __FUNCTION__);
+        return ret;
+    }
 }
 
 /*
@@ -190,7 +201,8 @@ jint process(JNIEnv *env, jclass clazz,
  * Method:    private void release(long handel)
  * Signature: (J)V
  */
-void release(JNIEnv *env, jobject thiz, jlong handel) {
+void release(JNIEnv *env, jobject thiz, jlong handel)
+{
     MixContext *ins = reinterpret_cast<MixContext *>(handel);
     delete ins;
 }
@@ -222,6 +234,7 @@ static const int gsMethodCount =
  */
 bool registerNativeFunctions(JNIEnv *env)
 {
+    LOGI("KalaMix registerNativeFunction");
     jclass clazz = env->FindClass(FULL_CLASS_NAME);
     return clazz != nullptr
            && 0 == env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);

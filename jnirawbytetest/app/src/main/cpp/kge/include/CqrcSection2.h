@@ -2,7 +2,7 @@
 #define C_SING_SECTION_QRC_H
 
 /************************************************************************/
-/* ·Ö¶ÎºÏ³ª¹¦ÄÜ£¬½âÎö·Ö¶ÎºÏ³ªµÄQRCÎÄ¼ş                   ¡£             */
+/* åˆ†æ®µåˆå”±åŠŸèƒ½ï¼Œè§£æåˆ†æ®µåˆå”±çš„QRCæ–‡ä»¶                   ã€‚             */
 /* written by ethanzhao, modified 3.12,2015.                            */
 /************************************************************************/
 
@@ -16,7 +16,7 @@ using namespace std;
 
 
 
-// ¶ÁÈ¡·ÇºÏ³ª¸è´Ê£¬È»ºóÖ±½Ó½«Æä·Ö³ÉAB¶Î¡£±£ÁôºÏ³ª²¿·Ö£¬ÔİÊ±²»·ÖºÏ³ª¡£
+// è¯»å–éåˆå”±æ­Œè¯ï¼Œç„¶åç›´æ¥å°†å…¶åˆ†æˆABæ®µã€‚ä¿ç•™åˆå”±éƒ¨åˆ†ï¼Œæš‚æ—¶ä¸åˆ†åˆå”±ã€‚
 class CqrcSection2
 {
 public:
@@ -30,9 +30,9 @@ public:
 	//int GetIdByTime		(int time_ms);				// get sentence id by time in ms;
 	//int GetIdTime	(int iID,int* iStratMs, int * iEndMs);			// get id's start ms and end ms.
 	
-	string* GetSingerA ( );	// »ñÈ¡singerAµÄÃû³Æ£¬ÈçÄĞ¡¢Å®
-	string* GetSingerB ( ); // »ñÈ¡singerBµÄÃû³Æ£¬ÈçÄĞ¡¢Å®
-	string* GetSingerC ( ); // »ñÈ¡singerCµÄÃû³Æ£¬ºÏ³ª¡£
+	string* GetSingerA ( );	// è·å–singerAçš„åç§°ï¼Œå¦‚ç”·ã€å¥³
+	string* GetSingerB ( ); // è·å–singerBçš„åç§°ï¼Œå¦‚ç”·ã€å¥³
+	string* GetSingerC ( ); // è·å–singerCçš„åç§°ï¼Œåˆå”±ã€‚
 
 	int GetSectionInfoA (vector<SectionSingers>* p_section);
 	int GetSectionInfoB (vector<SectionSingers>* p_section);
@@ -52,8 +52,8 @@ private:
 	int ExtractSentWords	( );	// find all the sentence words and erase the sub time.
 	int RemoveEnter			(string* qrc_words ); // remove enter key in qrc words;
 
-	//int CalSingerInfo	( );	// »ñÈ¡singerµÄ×Ö·û´®¡¢ÆğÊ¼¶ÎÂäµÈ£¬ºÏ³ªÈÏÎªÃ¿¸öÈË¶¼ÓĞ¡£
-	//int CheckMask		( );	// È·ÈÏºÏ³ªqrcµÄ±êÊ¶¡£
+	//int CalSingerInfo	( );	// è·å–singerçš„å­—ç¬¦ä¸²ã€èµ·å§‹æ®µè½ç­‰ï¼Œåˆå”±è®¤ä¸ºæ¯ä¸ªäººéƒ½æœ‰ã€‚
+	//int CheckMask		( );	// ç¡®è®¤åˆå”±qrcçš„æ ‡è¯†ã€‚
 
 	int calSection	( );
 
@@ -63,12 +63,12 @@ private:
 private:
 	int m_sentence_number;		// sentence number;
 
-	vector<SentTime> m_sent_time;// ËùÓĞ¾ä×ÓµÄÆğÊ¼Ê±¼ä;
+	vector<SentTime> m_sent_time;// æ‰€æœ‰å¥å­çš„èµ·å§‹æ—¶é—´;
 	vector<string>   m_words;	 // word;
 
 	string m_Singer_A;			 // singer A
 	string m_Singer_B;			 // singer B
-	string m_Singer_C;			 // ºÏ³ª
+	string m_Singer_C;			 // åˆå”±
 
 };
 

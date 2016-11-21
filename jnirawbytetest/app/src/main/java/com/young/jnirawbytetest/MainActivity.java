@@ -5,10 +5,13 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.ViewAnimator;
 
 import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
@@ -20,6 +23,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
+    private ViewAnimator mViewAnimator;
 
     Thread mRunningThread;
 
@@ -103,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mViewAnimator = (ViewAnimator) findViewById(R.id.animator);
 
         initRuler();
 
@@ -426,5 +433,27 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }, "superSound");
         mRunningThread.start();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuItem item = menu.add("Switch");
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        item.setIcon(getResources().getDrawable(android.R.drawable.ic_dialog_info));
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (super.onOptionsItemSelected(item)) {
+            return true;
+        } else if ("Switch".equals(item.getTitle())) {
+            int current = mViewAnimator.getDisplayedChild();
+            int count = mViewAnimator.getChildCount();
+            mViewAnimator.setDisplayedChild((current + 1) % count);
+            return true;
+        }
+        return false;
     }
 }

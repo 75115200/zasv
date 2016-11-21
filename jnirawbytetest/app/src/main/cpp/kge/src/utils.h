@@ -1,12 +1,11 @@
 /**
-* Author: landerlyoung@gmail.com
+* Author: taylorcyang@tencent.com
 * Date:   2016-08-30
 * Time:   17:06
 * Life with Passion, Code with Creativity.
 */
 
 #include <cstdint>
-#include <linux/time.h>
 #include <sys/time.h>
 
 namespace radio {
@@ -28,7 +27,7 @@ static constexpr int RIGHT = 1 << 1;
 
 /**
  * @param mono pcm buffer PCM16le
- * @param monoSize sizeOf mono buffer
+ * @param monoSize sizeOf mono buffer in bytes
  * @param stereo buffer to write data, it's length MUST >= 2 * monoSize
  * @param channelMask expand mono to left|right channel of the stereo data
  *
@@ -48,7 +47,8 @@ static constexpr int RIGHT = 1 << 1;
 inline void mono2stereo(
         std::uint8_t *mono,
         std::size_t monoSize,
-        std::uint8_t *stereo, int channelMask)
+        std::uint8_t *stereo,
+        int channelMask)
 {
     for (std::size_t i = 0; i < monoSize; i += 2) {
         uint16_t *monoPcm16 = reinterpret_cast<uint16_t *>(mono + i);
@@ -59,7 +59,7 @@ inline void mono2stereo(
             *stereoPcm16 = *monoPcm16;
         }
 
-        //right right channel
+        //right channel
         if (channelMask & RIGHT) {
             *(stereoPcm16 + 1) = *monoPcm16;
         }

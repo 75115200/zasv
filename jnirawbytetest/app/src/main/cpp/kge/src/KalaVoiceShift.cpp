@@ -191,12 +191,15 @@ static const JNINativeMethod gsNativeMethods[] = {
 static const int gsMethodCount =
         sizeof(gsNativeMethods) / sizeof(JNINativeMethod);
 
-/*
+/**
  * register Native functions
+ * @returns success or not
  */
-void registerNativeFunctions(JNIEnv *env) {
-    jclass clazz = env->FindClass("com/young/jnirawbytetest/audiotest/KalaVoiceShift");
-    env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);
+bool registerNativeFunctions(JNIEnv *env) {
+        LOGI("KalaShift registerNativeFunction");
+    jclass clazz = env->FindClass(FULL_CLASS_NAME);
+    return clazz != nullptr
+           && 0 == env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);
 }
 
 

@@ -32,7 +32,7 @@ namespace KalaVolumeScaler {
 
 /*
  * Class:     com_tencent_audioeffect_effect_KalaVolumeScaler
- * Method:    private static long create(int sampleRate, int dualChannel)
+ * Method:    private static long create(int sampleRate, int channelCount)
  * Signature: (II)J
  */
 jlong create(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount) {
@@ -115,6 +115,7 @@ static const int gsMethodCount =
  * @returns success or not
  */
 bool registerNativeFunctions(JNIEnv *env) {
+        LOGI("KalaVolumeScalar registerNativeFunction");
     jclass clazz = env->FindClass(FULL_CLASS_NAME);
     return clazz != nullptr
            && 0 == env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);

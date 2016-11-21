@@ -11,11 +11,14 @@
 #pragma once
 
 #include <jni.h>
+#include <cstdint>
+#include <map>
+#include <algorithm>
 
-namespace KalaReverb {
+namespace  KalaReverb {
 
 //DO NOT modify
-static constexpr auto FULL_CLASS_NAME = "com/tencent/audioeffect/effect/KalaReverb";
+static constexpr auto FULL_CLASS_NAME = "com/tencent/audioeffect/effect/impl/KalaReverb";
 
 static constexpr jint KALA_VB_NO_EFFECT_QUICKLY = 10;
 static constexpr jint KALA_VB_KTV_V40_QUICKLY = 11;
@@ -27,17 +30,23 @@ static constexpr jint KALA_VB_DIZZY_QUICKLY = 16;
 static constexpr jint KALA_VB_PHONOGRAPH_QUICKLY = 17;
 static constexpr jint KALA_VB_PHONOGRAPH_GENERIC_QUICKLY = 18;
 
+typedef struct ReverbParam {
+    int32_t sampleRate;
+    int32_t channelCount;
+} ReverbParam;
+
+static std::map<int64_t , ReverbParam*> paramMap;
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
- * Method:    private static long create(int sampleRate, int dualChannel)
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
+ * Method:    private static long create(int sampleRate, int channelCount)
  * Signature: (II)J
  */
 jlong create(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
  * Method:    private static void getIdRange(long nativeHandel, int[] maxAndMin)
  * Signature: (J[I)V
  */
@@ -45,7 +54,7 @@ void getIdRange(JNIEnv *env, jclass clazz, jlong nativeHandel, jintArray maxAndM
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
  * Method:    private static int getIdDefault(long nativeHandel)
  * Signature: (J)I
  */
@@ -53,7 +62,7 @@ jint getIdDefault(JNIEnv *env, jclass clazz, jlong nativeHandel);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
  * Method:    private static int setTypeId(long nativeHandel, int type)
  * Signature: (JI)I
  */
@@ -61,7 +70,7 @@ jint setTypeId(JNIEnv *env, jclass clazz, jlong nativeHandel, jint type);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
  * Method:    private static int getTypeId(long nativeHandel)
  * Signature: (J)I
  */
@@ -69,7 +78,7 @@ jint getTypeId(JNIEnv *env, jclass clazz, jlong nativeHandel);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
  * Method:    private static java.lang.String getNameId(long nativeHandel, int typeId)
  * Signature: (JI)Ljava/lang/String;
  */
@@ -77,16 +86,15 @@ jstring getNameId(JNIEnv *env, jclass clazz, jlong nativeHandel, jint typeId);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
  * Method:    private static int process(long nativeHandel, byte[] inBuffer, int insize, byte[] outBuffer, int outSize)
  * Signature: (J[BI[BI)I
  */
-jint process(JNIEnv *env, jclass clazz, jlong nativeHandel, jbyteArray inBuffer, jint insize,
-             jbyteArray outBuffer, jint outSize);
+jint process(JNIEnv *env, jclass clazz, jlong nativeHandel, jbyteArray inBuffer, jint insize, jbyteArray outBuffer, jint outSize);
 
 
 /*
- * Class:     com_tencent_audioeffect_effect_KalaReverb
+ * Class:     com_tencent_audioeffect_effect_impl_KalaReverb
  * Method:    private static void release(long nativeHandel)
  * Signature: (J)V
  */

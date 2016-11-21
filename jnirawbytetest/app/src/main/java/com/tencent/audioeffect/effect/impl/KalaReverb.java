@@ -1,4 +1,4 @@
-package com.tencent.audioeffect.effect;
+package com.tencent.audioeffect.effect.impl;
 
 import io.github.landerlyoung.jenny.NativeClass;
 

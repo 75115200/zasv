@@ -1,5 +1,5 @@
 #include "KalaAudioGain.h"
-#include <CautoGain.h>
+#include "CautoGain.h"
 
 #ifdef DEBUG
 #include <android/log.h>
@@ -20,13 +20,13 @@
 
 
 //change to whatever you like
-#define LOG_TAG "KalaAudioGain"
+static constexpr auto LOG_TAG =  "KalaAudioGain";
 
 namespace KalaAudioGain {
 
 /*
  * Class:     com_young_jnirawbytetest_audiotest_KalaAudioGain
- * Method:    private static long create(int sampleRate, int dualChannel)
+ * Method:    private static long create(int sampleRate, int channelCount)
  * Signature: (II)J
  */
 jlong create(JNIEnv *env, jclass clazz, jint sampleRate, jint channelCount) {
@@ -83,12 +83,20 @@ static const JNINativeMethod gsNativeMethods[] = {
 static const int gsMethodCount =
     sizeof(gsNativeMethods) / sizeof(JNINativeMethod);
 
-/*
+/**
  * register Native functions
+ * @returns success or not
  */
-void registerNativeFunctions(JNIEnv *env) {
-    jclass clazz = env->FindClass("com/young/jnirawbytetest/audiotest/KalaAudioGain");
-    env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);
+bool registerNativeFunctions(JNIEnv *env) {
+        LOGI("KalaAudioGain registerNativeFunction");
+    jclass clazz = env->FindClass(FULL_CLASS_NAME);
+    bool success =  clazz != nullptr
+           && 0 == env->RegisterNatives(clazz, gsNativeMethods, gsMethodCount);
+    if (!success) {
+        LOGE("%s failed!", __FUNCTION__);
+        env->ExceptionDescribe();
+    }
+    return success;
 }
 
 
