@@ -6,6 +6,6 @@
 # Created Time:		Fri Aug 26 18:35:14 2016
 #########################################################################
 
-for file in *.pcm;do
+for file in *.pcm*;do
     adb push $file /sdcard/Download/$file
 done

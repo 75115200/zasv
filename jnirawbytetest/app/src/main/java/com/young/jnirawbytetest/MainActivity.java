@@ -1,5 +1,6 @@
 package com.young.jnirawbytetest;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -14,9 +15,12 @@ import android.widget.Spinner;
 import android.widget.ViewAnimator;
 
 import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
+import com.young.jnirawbytetest.audiotest.AudioVolumeCalculator;
+import com.young.jnirawbytetest.audiotest.JniLocalRefTest;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
 import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
 
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     Handler h = new Handler();
     long totalTime = 10000;
+
+    String info;
 
     private void initRuler() {
         final AudioTimeRulerView rulerView = (AudioTimeRulerView) findViewById(R.id.time_ruler);
@@ -60,6 +66,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.start_anime).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                h.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        totalTime += 50;
+                        rulerView.notifyDataAdded(totalTime - 50, 50);
+                        h.postDelayed(this, 50);
+                    }
+                });
+                rulerView.notifyDataSetChanged();
+            }
+        });
+
+        findViewById(R.id.jni_local_ref_test).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                textJniLocalRef();
+            }
+        });
+        final AudioVolumeCalculator c = new AudioVolumeCalculator();
+
         rulerView.setRulerAdapter(new AudioTimeRulerView.RulerAdapter() {
             StringBuilder sb = new StringBuilder();
             Formatter mFormatter = new Formatter(sb, Locale.US);
@@ -87,21 +116,10 @@ public class MainActivity extends AppCompatActivity {
                 if (timeMillis < 0) {
                     return 0;
                 }
-                int count = (int) (timeMillis / 50);
-                return (int) ((count % 40) * (100f / 40));
+                return c.nextVolumeGain();
             }
         });
 
-        h.post(new Runnable() {
-            @Override
-            public void run() {
-                totalTime += 50;
-                rulerView.notifyDataAdded(totalTime - 50, 50);
-                h.postDelayed(this, 50);
-            }
-        });
-
-        rulerView.notifyDataSetChanged();
     }
 
     @Override
@@ -441,6 +459,10 @@ public class MainActivity extends AppCompatActivity {
         MenuItem item = menu.add("Switch");
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         item.setIcon(getResources().getDrawable(android.R.drawable.ic_dialog_info));
+
+        item = menu.add("Dialog");
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        item.setIcon(getResources().getDrawable(android.R.drawable.ic_dialog_alert));
         return true;
     }
 
@@ -453,7 +475,24 @@ public class MainActivity extends AppCompatActivity {
             int count = mViewAnimator.getChildCount();
             mViewAnimator.setDisplayedChild((current + 1) % count);
             return true;
+        } else if ("Dialog".equals(item.getTitle())) {
+            showDialog();
         }
         return false;
+    }
+
+    private void showDialog() {
+        new AlertDialog.Builder(this)
+                .setMessage(info == null ? "Hello \n\n\nWorld" : info)
+                .create()
+                .show();
+    }
+
+    private void textJniLocalRef() {
+        int arrLen = 4;
+        Object[] arr = new Object[arrLen];
+        Arrays.fill(arr, this);
+        info = JniLocalRefTest.process(arr);
+        showDialog();
     }
 }

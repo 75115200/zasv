@@ -6,6 +6,7 @@
 #include "kge/src/KalaReverb.h"
 #include "kge/src/KalaVolumeScaler.h"
 #include "kge/src/KalaClean.h"
+#include "kge/src/JniLocalRefTest.h"
 
 #define LOGV(...)   __android_log_print((int)ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
 #define LOGD(...)   __android_log_print((int)ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -30,7 +31,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
         && KalaToneShift::registerNativeFunctions(env)
         && KalaAudioGain::registerNativeFunctions(env)
         && KalaReverb::registerNativeFunctions(env)
-        && KalaVolumeScaler::registerNativeFunctions(env)) {
+        && KalaVolumeScaler::registerNativeFunctions(env)
+        && JniLocalRefTest::registerNativeFunctions(env)) {
 
         LOGI("%s registerNativeFunction success", __FUNCTION__);
         return JNI_VERSION_1_6;
