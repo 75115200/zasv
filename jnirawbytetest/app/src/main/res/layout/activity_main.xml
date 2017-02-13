@@ -48,6 +48,14 @@
             android:textAllCaps="false"
             />
 
+        <Button
+            android:id="@+id/decode_bitmap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DecodeBitmap"
+            android:textAllCaps="false"
+            />
+
     </LinearLayout>
 
     <ScrollView

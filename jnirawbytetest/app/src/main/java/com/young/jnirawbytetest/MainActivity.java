@@ -122,6 +122,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    private void initTest() {
+        findViewById(R.id.decode_bitmap).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BitmapDecodeTest.test(MainActivity.this);
+            }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
         mViewAnimator = (ViewAnimator) findViewById(R.id.animator);
 
         initRuler();
+
+        initTest();
 
         findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
             @Override
