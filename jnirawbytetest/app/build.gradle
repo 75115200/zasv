@@ -1,12 +1,18 @@
+import org.aspectj.bridge.IMessage
+import org.aspectj.bridge.MessageHandler
+import org.aspectj.tools.ajc.Main
+
 buildscript {
     repositories {
         maven {
             url "http://maven.oa.com/nexus/content/groups/androidbuild"
         }
+        mavenCentral()
         jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'org.aspectj:aspectjtools:1.8.1'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -19,7 +25,6 @@ repositories {
 }
 apply plugin: 'com.android.application'
 
-final String INSTANT_RUN_FALVOR = 'instantRun'
 android {
     compileSdkVersion 23
     buildToolsVersion "24.0.0"
@@ -64,12 +69,6 @@ android {
         pruduct {
             //default publish flavor
         }
-
-        //instant-run flavor
-        "$INSTANT_RUN_FALVOR" {
-            minSdkVersion 21
-            targetSdkVersion 22
-        }
     }
 
     //set its value according to CI env
@@ -85,20 +84,40 @@ android {
     }
 
     applicationVariants.all { variant ->
-        //Removing multi process settings in manifest, to enable instant-run.
-        if (variant.name.startsWith(INSTANT_RUN_FALVOR)) {
-            variant.outputs.each { output ->
-                output.processManifest.doLast {
-                    [output.processManifest.instantRunManifestOutputFile,
-                     output.processManifest.manifestOutputFile,
-                     output.processManifest.aaptFriendlyManifestOutputFile
-                    ].grep { it?.exists() }.each { manifestFile ->
-                        def oldFileContents = manifestFile.getText('UTF-8')
-                        def newFileContents = oldFileContents.replaceAll('android:process=\".*\"', '')
-                        manifestFile.write(newFileContents, 'UTF-8')
+        def javaCompile = variant.javaCompiler
+        def log = logger;
+        javaCompile.doLast {
+            String[] args = [
+                    '-showWeaveInfo',
+                    '-1.8',
+                    '-inpath', javaCompile.destinationDir as String,
+                    '-aspectpath', javaCompile.classpath.asPath,
+                    '-d', javaCompile.destinationDir as String,
+                    '-classpath', javaCompile.classpath.asPath,
+                    '-bootclasspath', android.bootClasspath.join(File.pathSeparator)
+            ]
 
-                        println "remove all android:process attr for ${manifestFile.absolutePath}"
-                    }
+            log.debug "ajc args: " + Arrays.toString(args)
+
+            MessageHandler handler = new MessageHandler(true);
+            new Main().run(args, handler);
+            for (IMessage message : handler.getMessages(null, true)) {
+                println message
+                switch (message.getKind()) {
+                    case IMessage.ABORT:
+                    case IMessage.ERROR:
+                    case IMessage.FAIL:
+                        log.error message.message, message.thrown
+                        break;
+                    case IMessage.WARNING:
+                        log.warn message.message, message.thrown
+                        break;
+                    case IMessage.INFO:
+                        log.info message.message, message.thrown
+                        break;
+                    case IMessage.DEBUG:
+                        log.debug message.message, message.thrown
+                        break;
                 }
             }
         }
@@ -107,7 +126,9 @@ android {
 
 dependencies {
     provided 'io.github.landerlyoung:jenny-annotation:0.1.0'
-    annotationProcessor 'io.github.landerlyoung:jenny-compiler:0.1.0'
+//    annotationProcessor 'io.github.landerlyoung:jenny-compiler:0.1.0'
+
+    compile 'org.aspectj:aspectjrt:1.8.1'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

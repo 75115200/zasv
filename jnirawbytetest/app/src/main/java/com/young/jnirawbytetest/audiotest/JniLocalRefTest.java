@@ -15,6 +15,8 @@ import io.github.landerlyoung.jenny.NativeClass;
 @NativeClass
 public class JniLocalRefTest {
     static {
+        System.loadLibrary("webrtc_audio_preprocessing_v7a");
+        System.loadLibrary("audiobase_v7a");
         System.loadLibrary("audio_test");
     }
     public static native String process(@NonNull Object... arr);

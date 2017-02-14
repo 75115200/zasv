@@ -20,7 +20,6 @@ import android.widget.ViewAnimator;
 
 import com.tencent.LzmaDecoder;
 import com.tencent.NativeLibInjectUtils;
-import com.tencent.ReflectUtils;
 import com.tencent.ZipUtils;
 import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
 import com.young.jnirawbytetest.audiotest.AudioVolumeCalculator;
@@ -36,9 +35,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
-
-import dalvik.system.BaseDexClassLoader;
-import dalvik.system.PathClassLoader;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -148,6 +144,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public static String libPath;
+
     private void extractNativeLibs() {
         final SharedPreferences sp = getSharedPreferences("native-so", MODE_PRIVATE);
         final File libPath = new File(getFilesDir(), "library");
@@ -180,19 +178,20 @@ public class MainActivity extends AppCompatActivity {
                     Log.i(TAG, "doInBackground: decode lzma done");
 
                     publishProgress("unzip ...");
+                    MainActivity.libPath = libPath.getAbsolutePath();
 
                     ZipUtils.unZipFile(tmpZipFile, libPath.getAbsolutePath());
 
                     tmpZipFile.delete();
 
                     Log.i(TAG, "doInBackground: unzip done");
-                    PathClassLoader pathClassLoader = (PathClassLoader) getClassLoader();
-                    @SuppressWarnings("unchecked")
-                    Class<BaseDexClassLoader> dexClassLoaderClass = (Class<BaseDexClassLoader>) PathClassLoader.class.getSuperclass();
-                    Object nativeLibraryPathElements = ReflectUtils.getField(dexClassLoaderClass, "nativeLibraryPathElements", pathClassLoader);
+//                    PathClassLoader pathClassLoader = (PathClassLoader) getClassLoader();
+//                    @SuppressWarnings("unchecked")
+//                    Class<BaseDexClassLoader> dexClassLoaderClass = (Class<BaseDexClassLoader>) PathClassLoader.class.getSuperclass();
+//                    Object nativeLibraryPathElements = ReflectUtils.getField(dexClassLoaderClass, "nativeLibraryPathElements", pathClassLoader);
+//                    return NativeLibInjectUtils.addLibPath(getApplication(), libPath.getAbsolutePath());
 
-
-                    return NativeLibInjectUtils.addLibPath(getApplication(), libPath.getAbsolutePath());
+                    return true;
                 } catch (IOException e) {
                     return Boolean.FALSE;
                 }
@@ -552,10 +551,6 @@ public class MainActivity extends AppCompatActivity {
         MenuItem item = menu.add("Switch");
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         item.setIcon(getResources().getDrawable(android.R.drawable.ic_dialog_info));
-
-        item = menu.add("Dialog");
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        item.setIcon(getResources().getDrawable(android.R.drawable.ic_dialog_alert));
         return true;
     }
 
@@ -568,8 +563,6 @@ public class MainActivity extends AppCompatActivity {
             int count = mViewAnimator.getChildCount();
             mViewAnimator.setDisplayedChild((current + 1) % count);
             return true;
-        } else if ("Dialog".equals(item.getTitle())) {
-            showDialog();
         }
         return false;
     }
