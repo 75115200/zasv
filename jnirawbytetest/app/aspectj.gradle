@@ -23,8 +23,16 @@ project.dependencies {
 }
 
 variants.all { variant ->
+    def applicationVariantData = variant.variantData
+
+   for (def f :applicationVariantData.class.getFields()) {
+       println f
+   }
+
+    def dexTask = applicationVariantData.dexTask;
     def javaCompile = variant.javaCompiler
-    javaCompile.doLast {
+
+    dexTask.doFirst {
         String[] args = [
                 '-showWeaveInfo',
                 '-1.8',

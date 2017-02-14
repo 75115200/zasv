@@ -21,6 +21,7 @@ import android.widget.ViewAnimator;
 import com.tencent.LzmaDecoder;
 import com.tencent.NativeLibInjectUtils;
 import com.tencent.ZipUtils;
+import com.tencent.common.NativeLibLoader;
 import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
 import com.young.jnirawbytetest.audiotest.AudioVolumeCalculator;
 import com.young.jnirawbytetest.audiotest.JniLocalRefTest;
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 //                    Object nativeLibraryPathElements = ReflectUtils.getField(dexClassLoaderClass, "nativeLibraryPathElements", pathClassLoader);
 //                    return NativeLibInjectUtils.addLibPath(getApplication(), libPath.getAbsolutePath());
 
-                    return true;
+                    return NativeLibLoader.installNativeLibraryPathSilently(getClassLoader(), libPath);
                 } catch (IOException e) {
                     return Boolean.FALSE;
                 }

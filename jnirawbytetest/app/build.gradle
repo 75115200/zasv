@@ -79,6 +79,10 @@ android {
 
         variant.setIgnore(ignore)
     }
+
+    applicationVariants.all {
+
+    }
 }
 
 dependencies {
