@@ -1,6 +1,9 @@
 package com.young.jnirawbytetest;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -12,17 +15,30 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 import android.widget.ViewAnimator;
 
+import com.tencent.LzmaDecoder;
+import com.tencent.NativeLibInjectUtils;
+import com.tencent.ReflectUtils;
+import com.tencent.ZipUtils;
 import com.tencent.radio.ugc.record.widget.AudioTimeRulerView;
 import com.young.jnirawbytetest.audiotest.AudioVolumeCalculator;
 import com.young.jnirawbytetest.audiotest.JniLocalRefTest;
 import com.young.jnirawbytetest.audiotest.KgeAudioTest;
 import com.young.jnirawbytetest.audiotest.encoder.AACEncoderTestCase;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
+
+import dalvik.system.BaseDexClassLoader;
+import dalvik.system.PathClassLoader;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -132,6 +148,69 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void extractNativeLibs() {
+        final SharedPreferences sp = getSharedPreferences("native-so", MODE_PRIVATE);
+        final File libPath = new File(getFilesDir(), "library");
+        if (sp.getBoolean("installed", false)) {
+            NativeLibInjectUtils.addLibPath(this, libPath.getAbsolutePath());
+            return;
+        }
+
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setCancelable(false);
+        pd.show();
+
+        new AsyncTask<Void, String, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                InputStream in = null;
+                OutputStream out = null;
+
+                try {
+                    publishProgress("decode lzma...");
+                    Log.i(TAG, "doInBackground: start decode lzma");
+                    File tmpZipFile = new File(getCacheDir(), "lib.zip");
+                    out = new FileOutputStream(tmpZipFile);
+                    in = getAssets().open("libs.zip.lzma");
+
+                    LzmaDecoder.decode(in, out);
+
+                    in.close();
+                    out.close();
+                    Log.i(TAG, "doInBackground: decode lzma done");
+
+                    publishProgress("unzip ...");
+
+                    ZipUtils.unZipFile(tmpZipFile, libPath.getAbsolutePath());
+
+                    tmpZipFile.delete();
+
+                    Log.i(TAG, "doInBackground: unzip done");
+                    PathClassLoader pathClassLoader = (PathClassLoader) getClassLoader();
+                    @SuppressWarnings("unchecked")
+                    Class<BaseDexClassLoader> dexClassLoaderClass = (Class<BaseDexClassLoader>) PathClassLoader.class.getSuperclass();
+                    Object nativeLibraryPathElements = ReflectUtils.getField(dexClassLoaderClass, "nativeLibraryPathElements", pathClassLoader);
+
+
+                    return NativeLibInjectUtils.addLibPath(getApplication(), libPath.getAbsolutePath());
+                } catch (IOException e) {
+                    return Boolean.FALSE;
+                }
+            }
+
+            @Override
+            protected void onProgressUpdate(String... values) {
+                pd.setMessage(values[0]);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                pd.hide();
+                Toast.makeText(MainActivity.this, success ? "success" : "falied", Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -142,6 +221,8 @@ public class MainActivity extends AppCompatActivity {
         initRuler();
 
         initTest();
+
+        extractNativeLibs();
 
         findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
             @Override
